@@ -1,0 +1,1 @@
+const String splashLogo = "assets/splashLogo/netflix.png";
