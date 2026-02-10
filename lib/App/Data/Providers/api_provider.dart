@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 
 
 class ApiProvider extends GetConnect {
-  static const _apiKey = 'YOUR_TMDB_API_KEY';
+  static const _apiKey = 'https://www.omdbapi.com/?i=tt3896198&apikey=fe70e995';
 
 
   @override
