@@ -1,18 +1,18 @@
-class Movies {
+class UpcomingMovies {
   Dates? dates;
   int? page;
   List<Results>? results;
   int? totalPages;
   int? totalResults;
 
-  Movies(
+  UpcomingMovies(
       {this.dates,
         this.page,
         this.results,
         this.totalPages,
         this.totalResults});
 
-  Movies.fromJson(Map<String, dynamic> json) {
+  UpcomingMovies.fromJson(Map<String, dynamic> json) {
     dates = json['dates'] != null ? new Dates.fromJson(json['dates']) : null;
     page = json['page'];
     if (json['results'] != null) {
@@ -94,24 +94,17 @@ class Results {
   Results.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];
     backdropPath = json['backdrop_path'];
-    genreIds = json['genre_ids'] != null
-        ? List<int>.from(json['genre_ids'])
-        : [];
-    // genreIds = json['genre_ids'].cast<int>();
+    genreIds = json['genre_ids'].cast<int>();
     id = json['id'];
     originalLanguage = json['original_language'];
     originalTitle = json['original_title'];
     overview = json['overview'];
-    // popularity = json['popularity'];
-    popularity = (json['popularity'] as num?)?.toDouble();
-
+    popularity = json['popularity'];
     posterPath = json['poster_path'];
     releaseDate = json['release_date'];
     title = json['title'];
     video = json['video'];
-    // voteAverage = json['vote_average'];
-    voteAverage = (json['vote_average'] as num?)?.toDouble();
-
+    voteAverage = json['vote_average'];
     voteCount = json['vote_count'];
   }
 

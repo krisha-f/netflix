@@ -32,7 +32,7 @@ class AppPages {
         page: () => const HomeView(),
         binding: HomeBindings()),
     GetPage(name: AppRoutes.movieDetails,
-        page: () => const MovieDetailsView(),
+        page: () =>  MovieDetailsView(),
         binding: MovieDetailsBinding()),
     GetPage(name: AppRoutes.search,
         page: () => const SearchView(),

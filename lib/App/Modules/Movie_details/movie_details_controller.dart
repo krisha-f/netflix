@@ -1,7 +1,28 @@
 
 import 'package:get/get.dart';
 
-class MovieDetailsController extends GetxController{
+import '../../Data/Models/movie_details_model.dart';
+import '../../Data/Services/apiservice.dart';
 
-  // final Movie movie = Get.arguments;
+class MovieDetailsController extends GetxController{
+  late int movieId;
+
+  late Future<MovieDetails?> movieDetailsData;
+
+
+  final ApiService apiService = ApiService();
+
+
+  @override
+  void onInit() {
+    super.onInit();
+    movieId = Get.arguments;
+    print("*******************");
+    print("MOVIE ID RECEIVED: $movieId");
+    movieDetailsData = apiService.movieDetails(movieId);
+    print("*******************");
+    print("MOVIE ID RECEIVED: $movieDetailsData");
+    // movieDetailsData =apiService.movieDetails();
+  }
+
 }

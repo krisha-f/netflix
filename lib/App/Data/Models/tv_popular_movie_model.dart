@@ -1,19 +1,13 @@
-class Movies {
-  Dates? dates;
+class TvPopularMovies {
   int? page;
   List<Results>? results;
   int? totalPages;
   int? totalResults;
 
-  Movies(
-      {this.dates,
-        this.page,
-        this.results,
-        this.totalPages,
-        this.totalResults});
+  TvPopularMovies(
+      {this.page, this.results, this.totalPages, this.totalResults});
 
-  Movies.fromJson(Map<String, dynamic> json) {
-    dates = json['dates'] != null ? new Dates.fromJson(json['dates']) : null;
+  TvPopularMovies.fromJson(Map<String, dynamic> json) {
     page = json['page'];
     if (json['results'] != null) {
       results = <Results>[];
@@ -27,9 +21,6 @@ class Movies {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.dates != null) {
-      data['dates'] = this.dates!.toJson();
-    }
     data['page'] = this.page;
     if (this.results != null) {
       data['results'] = this.results!.map((v) => v.toJson()).toList();
@@ -40,38 +31,19 @@ class Movies {
   }
 }
 
-class Dates {
-  String? maximum;
-  String? minimum;
-
-  Dates({this.maximum, this.minimum});
-
-  Dates.fromJson(Map<String, dynamic> json) {
-    maximum = json['maximum'];
-    minimum = json['minimum'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['maximum'] = this.maximum;
-    data['minimum'] = this.minimum;
-    return data;
-  }
-}
-
 class Results {
   bool? adult;
   String? backdropPath;
   List<int>? genreIds;
   int? id;
+  List<String>? originCountry;
   String? originalLanguage;
-  String? originalTitle;
+  String? originalName;
   String? overview;
   double? popularity;
   String? posterPath;
-  String? releaseDate;
-  String? title;
-  bool? video;
+  String? firstAirDate;
+  String? name;
   double? voteAverage;
   int? voteCount;
 
@@ -80,38 +52,31 @@ class Results {
         this.backdropPath,
         this.genreIds,
         this.id,
+        this.originCountry,
         this.originalLanguage,
-        this.originalTitle,
+        this.originalName,
         this.overview,
         this.popularity,
         this.posterPath,
-        this.releaseDate,
-        this.title,
-        this.video,
+        this.firstAirDate,
+        this.name,
         this.voteAverage,
         this.voteCount});
 
   Results.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];
     backdropPath = json['backdrop_path'];
-    genreIds = json['genre_ids'] != null
-        ? List<int>.from(json['genre_ids'])
-        : [];
-    // genreIds = json['genre_ids'].cast<int>();
+    genreIds = json['genre_ids'].cast<int>();
     id = json['id'];
+    originCountry = json['origin_country'].cast<String>();
     originalLanguage = json['original_language'];
-    originalTitle = json['original_title'];
+    originalName = json['original_name'];
     overview = json['overview'];
-    // popularity = json['popularity'];
-    popularity = (json['popularity'] as num?)?.toDouble();
-
+    popularity = json['popularity'];
     posterPath = json['poster_path'];
-    releaseDate = json['release_date'];
-    title = json['title'];
-    video = json['video'];
-    // voteAverage = json['vote_average'];
-    voteAverage = (json['vote_average'] as num?)?.toDouble();
-
+    firstAirDate = json['first_air_date'];
+    name = json['name'];
+    voteAverage = json['vote_average'];
     voteCount = json['vote_count'];
   }
 
@@ -121,14 +86,14 @@ class Results {
     data['backdrop_path'] = this.backdropPath;
     data['genre_ids'] = this.genreIds;
     data['id'] = this.id;
+    data['origin_country'] = this.originCountry;
     data['original_language'] = this.originalLanguage;
-    data['original_title'] = this.originalTitle;
+    data['original_name'] = this.originalName;
     data['overview'] = this.overview;
     data['popularity'] = this.popularity;
     data['poster_path'] = this.posterPath;
-    data['release_date'] = this.releaseDate;
-    data['title'] = this.title;
-    data['video'] = this.video;
+    data['first_air_date'] = this.firstAirDate;
+    data['name'] = this.name;
     data['vote_average'] = this.voteAverage;
     data['vote_count'] = this.voteCount;
     return data;
