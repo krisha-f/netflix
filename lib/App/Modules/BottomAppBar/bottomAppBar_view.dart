@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/simple/get_view.dart';
+import '../../../Constant/app_colors.dart';
+import '../../../Constant/app_size.dart';
+import '../../../Constant/app_strings.dart';
+import '../Home/home_view.dart';
+import '../HotNews/hotnews_view.dart';
+import '../Search/search_view.dart';
+import 'bottomAppBar_controller.dart';
+
+class BottomAppbarView extends GetView<BottomAppbarController> {
+  const BottomAppbarView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        bottomNavigationBar: Container(
+          color: blackColor,
+          height: bottomBar,
+          child: TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.home), text: homeText),
+              Tab(icon: Icon(Icons.search), text: searchText),
+              Tab(icon: Icon(Icons.library_add), text: hotNewsText),
+            ],
+            unselectedLabelColor: greyColor,
+            labelColor: whiteColor,
+            indicatorColor: transparentColor,
+          ),
+        ),
+        body: TabBarView(children: [
+
+          HomeView(),
+          SearchView(),
+          HotNewsView()
+        ]),
+      ),
+    );
+  }
+}

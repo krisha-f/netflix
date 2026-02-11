@@ -31,7 +31,6 @@ import '../../Data/Services/storage_service.dart';
 import '../../Routes/app_pages.dart';
 
 class SplashController extends GetxController {
-  final StorageService storageService = Get.find<StorageService>();
 
   @override
   void onInit() {
@@ -39,24 +38,16 @@ class SplashController extends GetxController {
     _startSplashTimer();
   }
 
-  void _startSplashTimer() {
-    Timer(const Duration(seconds: 2), () async {
-      await _handleNavigation();
-    });
+  Future<void> _startSplashTimer() async {
+    await Future.delayed(const Duration(seconds: 2));
+    Get.offAllNamed(AppRoutes.bottomAppBar);
+    // Timer(const Duration(seconds: 4), () async {
+    //   Get.offAllNamed(AppRoutes.login);
+    //   // await _handleNavigation();
+    // });
   }
 
   Future<void> _handleNavigation() async {
-    // final hasInternet = await NetworkService.hasInternet();
-    //
-    // if (!hasInternet) {
-    //   Get.offAllNamed(Routes.NO_INTERNET);
-    //   return;
-    // }
-
-    // if (storageService.isLoggedIn) {
-    //   Get.offAllNamed(AppRoutes.splash);
-    // } else {
       Get.offAllNamed(AppRoutes.login);
-    // }
   }
 }

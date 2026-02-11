@@ -1,6 +1,10 @@
 import 'package:get/get_navigation/src/routes/get_route.dart';
+import '../Modules/BottomAppBar/bottomAppBar_binding.dart';
+import '../Modules/BottomAppBar/bottomAppBar_view.dart';
 import '../Modules/Home/home_binding.dart';
 import '../Modules/Home/home_view.dart';
+import '../Modules/HotNews/hotnews_binding.dart';
+import '../Modules/HotNews/hotnews_view.dart';
 import '../Modules/Login/login_binding.dart';
 import '../Modules/Login/login_view.dart';
 import '../Modules/Movie_details/movie_details_binding.dart';
@@ -42,5 +46,11 @@ class AppPages {
     GetPage(name: AppRoutes.settings,
         page: () => const ProfileView(),
         binding: ProfileBinding()),
+    GetPage(name: AppRoutes.bottomAppBar,
+        page: () => const BottomAppbarView(),
+        binding: BottomAppbarBinding()),
+    GetPage(name: AppRoutes.hotNews,
+        page: () => const HotNewsView(),
+        binding: HotNewsBinding())
   ];
 }
