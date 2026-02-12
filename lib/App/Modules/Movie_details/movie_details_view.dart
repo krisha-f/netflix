@@ -46,6 +46,10 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
             }
             if (snapshot.hasData) {
               final movie = snapshot.data;
+              String genresText = movie?.genres
+                  ?.map((genre) => genre.name)
+                  .join(", ")
+                  ?? "";
               return Column(
                 children: [
                   Stack(
@@ -66,15 +70,15 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                         top: 50,
                         child: Row(
                           children: [
-                            GestureDetector(
+                            InkWell(
                               onTap: (){
-                                  // Get.off(context).pop();
+                                  Get.back();
                               },
-                              child: CircleAvatar(
-                                backgroundColor: blackColor,
-                                child: Icon(Icons.close,color: whiteColor,),
+                                child: CircleAvatar(
+                                  backgroundColor: blackColor,
+                                  child: Icon(Icons.close,color: whiteColor,),
+                                ),
                               ),
-                            ),
                             SizedBox(width: size1,),
                             CircleAvatar(
                               backgroundColor: blackColor,
@@ -97,18 +101,22 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            movie?.title ?? "",
-                            style: TextStyle(
-                              color: whiteColor,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            flex: 6,
+                            child: Text(
+                              movie?.title ?? "",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: whiteColor,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          Image.asset(splashLogo,height: 50,width: 100,)
+                          Expanded(flex:2,child: Image.asset(splashLogo,height: 50,width: 100,))
                         ],
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             movie?.releaseDate ?? "",
@@ -117,7 +125,13 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          SizedBox(width: size1,),
                           Text(formateRuntime(movie?.runtime ?? 0)),
+                          SizedBox(width: size1,),
+                          Text("HD",   style: TextStyle(
+                            color: whiteColor,
+                            fontWeight: FontWeight.bold,
+                          ),)
                         ],
                       ),
                       SizedBox(height: size1,),
@@ -182,44 +196,149 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                         ),
                       ) ,
                       SizedBox(height: size1,),
+                      Align(
+                          alignment: Alignment.topLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 18.0),
+                            child: Text(genresText,style: TextStyle(color: greyColor),),
+                          )),
+
                       Text(movie?.overview ?? "",style: TextStyle(color: whiteColor),),
                       Divider(thickness: 2,),
 
-                      Align(
-                          alignment: Alignment.topLeft,
-                          child: Text("Title : ${movie?.title ?? ""}",style: TextStyle(color: whiteColor))),
-                      Align(
-                          alignment: Alignment.topLeft,
-                          child: Text("Status : ${movie?.status ?? ""}",style: TextStyle(color: whiteColor),)),
+                      // Align(
+                      //     alignment: Alignment.topLeft,
+                      //     child: Text("Title : ${movie?.title ?? ""}",style: TextStyle(color: whiteColor))),
+                      // Align(
+                      //     alignment: Alignment.topLeft,
+                      //     child: Text("Status : ${movie?.status ?? ""}",style: TextStyle(color: whiteColor),)),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Column(
                             children: [
                               Icon(Icons.add,color: whiteColor,),
                               SizedBox(height: size1),
-                              Text("Add",style: TextStyle(color: whiteColor,),)
+                              Text("My List",style: TextStyle(color: whiteColor,),)
                             ],
                           ),
                           SizedBox(width: size1,),
                           Column(
                             children: [
-                              Icon(Icons.add,color: whiteColor,),
+                              Icon(Icons.thumb_up,color: whiteColor,),
                               SizedBox(height: size1),
 
-                              Text("Add",style: TextStyle(color: whiteColor,),)
+                              Text("Rate",style: TextStyle(color: whiteColor,),)
                             ],
                           ),
                           SizedBox(width: size1,),
                           Column(
                             children: [
-                              Icon(Icons.add,color: whiteColor,),
+                              Icon(Icons.share,color: whiteColor,),
                               SizedBox(height: size1),
-                              Text("Add",style: TextStyle(color: whiteColor,),)
+                              Text("Share",style: TextStyle(color: whiteColor,),)
                             ],
                           )
                         ],
-                      )
+                      ),
+                      SizedBox(height: size1,),
+                      // FutureBuilder(future: controller.movieRecommendationsData, builder: (context,snapshot){
+                      //   if(snapshot.hasData){
+                      //     final movie = snapshot.data;
+                      //     return (movie?.results?.isEmpty ?? true)? SizedBox(): Column(
+                      //       crossAxisAlignment: CrossAxisAlignment.start,
+                      //       children: [
+                      //         Text("More Like this",style:  TextStyle(color: whiteColor),),
+                      //         SizedBox(height: size1,),
+                      //         SizedBox(
+                      //           height: 200,
+                      //           child: ListView.builder(
+                      //             scrollDirection: Axis.horizontal,
+                      //               shrinkWrap :true,
+                      //               padding : EdgeInsets.zero,
+                      //               itemCount : movie?.results?.length ,
+                      //               itemBuilder: (context,index){
+                      //             return Padding(
+                      //               padding: const EdgeInsets.all(8.0),
+                      //               child: CachedNetworkImage(imageUrl: "$imageUrl${movie?.results?[index].posterPath}",height: 200,width: 200,fit: BoxFit.cover,),
+                      //             );
+                      //
+                      //           }),
+                      //         )
+                      //       ],
+                      //     );
+                      //   }
+                      //   return Text("something went wrong");
+                      // })
+                      FutureBuilder(
+                        future: controller.movieRecommendationsData,
+                        builder: (context, snapshot) {
 
+                          // 🔵 1. Loading state
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          // 🔴 2. Error state
+                          if (snapshot.hasError) {
+                            return const Center(
+                              child: Text(
+                                "Something went wrong",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            );
+                          }
+
+                          // 🟢 3. No data
+                          if (!snapshot.hasData || snapshot.data == null) {
+                            return const SizedBox();
+                          }
+
+                          final movie = snapshot.data;
+
+                          if (movie?.results == null || movie!.results!.isEmpty) {
+                            return const SizedBox();
+                          }
+
+                          // ✅ 4. Success state
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "More Like this",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                height: 200,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: movie.results!.length,
+                                  itemBuilder: (context, index) {
+                                    final item = movie.results![index];
+
+                                    if (item.posterPath == null) {
+                                      return const SizedBox();
+                                    }
+
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: CachedNetworkImage(
+                                        imageUrl: "$imageUrl${item.posterPath}",
+                                        height: 200,
+                                        width: 130,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      )
 
                     ],
                   )

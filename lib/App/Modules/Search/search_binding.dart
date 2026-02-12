@@ -6,6 +6,8 @@ import 'package:netflix/App/Modules/Search/search_controller.dart';
 class SearchBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put<SearchController>(SearchController());
+    // Get.put<SearchController>(SearchController());
+    Get.lazyPut<SearchController>(() => SearchController());
+
   }
 }

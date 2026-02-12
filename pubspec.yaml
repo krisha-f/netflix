@@ -20,12 +20,24 @@ dependencies:
   lottie:
   http:
   intl:
+  firebase_core:
+  firebase_auth:
+  font_awesome_flutter:
+  google_sign_in:
+  get_storage:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/appLogo/Netflix_app_logo.png"
 
 
 flutter:

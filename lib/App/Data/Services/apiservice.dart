@@ -4,8 +4,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:netflix/App/Data/Services/utils.dart';
 
+import '../Models/hot_news_model.dart';
 import '../Models/movie_details_model.dart';
 import '../Models/movie_model.dart';
+import '../Models/movie_recommendation_model.dart';
+import '../Models/search_movie_model.dart';
 import '../Models/top_rated_movie_model.dart';
 import '../Models/trending_movie_model.dart';
 import '../Models/tv_popular_movie_model.dart';
@@ -126,5 +129,64 @@ class ApiService {
     }
   }
 
+  //movie recommendations
+  Future<MovieRecommendations?> movieRecommendations(int movieId) async{
+    try{
+      // movie/257048
+      final endPoint= "movie/$movieId/recommendations";
+      final apiUrl = "$baseUrl$endPoint$key";
+      final response = await http.get(Uri.parse(apiUrl));
+      if(response.statusCode == 200){
+        return MovieRecommendations.fromJson(jsonDecode(response.body));      }
+      else{
+        throw Exception("Failed to Load Movies");
+      }
+    }
+    catch(e){
+      throw Exception("Fetching error to find movies: $e");
+    }
+  }
+
+
+  //search movies
+  Future<SearchMovies?> searchMovies(String query) async{
+    try{
+      final endPoint= "search/movie";
+      final apiUrl = "$baseUrl$endPoint$key&query=$query";
+      final response = await http.get(Uri.parse(apiUrl),
+          headers: {
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMjdkN2Q4NzljNzUwZWI4NTc0NzA1YWY5NDIzZjBlMiIsIm5iZiI6MTc3MDc4NTY1Ni43Mjk5OTk4LCJzdWIiOiI2OThjMGI3ODM1Y2I4YTFjMDgwOWMxYmIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.cZgkGU3EOHIH7PyIVLFCsVAFHOYzS7DEKXKfd0ENcvQ"
+      });
+      if(response.statusCode == 200){
+        return SearchMovies.fromJson(jsonDecode(response.body));      }
+      else{
+        throw Exception("Failed to Load Movies");
+      }
+    }
+    catch(e){
+      throw Exception("Fetching error to find movies: $e");
+    }
+  }
+
+  //hot news
+  Future<HotNews?> hotNews() async{
+    try{
+      final endPoint= "trending/all/day";
+      final apiUrl = "$baseUrl$endPoint$key";
+      final response = await http.get(Uri.parse(apiUrl));
+      if(response.statusCode == 200){
+        return HotNews.fromJson(jsonDecode(response.body));      }
+      else{
+        throw Exception("Failed to Load Hot News");
+      }
+    }
+    catch(e){
+      throw Exception("Fetching error to find Hot News: $e");
+    }
+  }
+
 }
 
+
+//movieid
+//query = harry

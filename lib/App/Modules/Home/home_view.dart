@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
@@ -11,16 +12,20 @@ import '../../../Constant/app_images.dart';
 import '../../../Constant/app_size.dart';
 import '../../../Constant/app_strings.dart';
 import '../../Data/Services/utils.dart';
+import '../MyList/mylist_controller.dart';
 import 'home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
-  const HomeView({super.key});
+   HomeView({super.key});
+
+  final myListController = Get.put(MyListController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: blackColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
+        controller: controller.scrollController,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -32,7 +37,11 @@ class HomeView extends GetView<HomeController> {
                   Image.asset(splashLogo, height: imageSize1),
                   Spacer(),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.offAllNamed(
+                        AppRoutes.search,
+                      );
+                    },
                     icon: Icon(Icons.search, color: whiteColor),
                   ),
                   Icon(Icons.download_sharp, color: whiteColor),
@@ -46,7 +55,10 @@ class HomeView extends GetView<HomeController> {
               child: Row(
                 children: [
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.scrollController.animateTo(700, duration: Duration(milliseconds: 100), curve: Curves.bounceIn);
+
+                    },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(color: greyColor),
@@ -61,7 +73,10 @@ class HomeView extends GetView<HomeController> {
                   ),
                   SizedBox(width: size1),
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.scrollController.animateTo(300, duration: Duration(milliseconds: 100), curve: Curves.bounceIn);
+
+                    },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(color: greyColor),
@@ -77,7 +92,9 @@ class HomeView extends GetView<HomeController> {
                   SizedBox(width: size1),
 
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+
+                    },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(color: greyColor),
@@ -194,28 +211,69 @@ class HomeView extends GetView<HomeController> {
                             ),
                           ),
                           SizedBox(width: size2),
-                          Container(
-                            height: 50,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              color: greyColor,
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(Icons.list_alt, color: whiteColor),
-                                Text(
-                                  "My List",
-                                  style: TextStyle(
-                                    color: whiteColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          // Container(
+                          //   height: 50,
+                          //   width: 150,
+                          //   decoration: BoxDecoration(
+                          //     color: greyColor,
+                          //     borderRadius: BorderRadius.circular(5),
+                          //   ),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.center,
+                          //     crossAxisAlignment: CrossAxisAlignment.center,
+                          //     children: [
+                          //       Icon(Icons.list_alt, color: whiteColor),
+                          //       Text(
+                          //         "My List",
+                          //         style: TextStyle(
+                          //           color: whiteColor,
+                          //           fontWeight: FontWeight.bold,
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          Obx(() {
+                            final currentMovie = controller.currentMovie.value;
+
+                            final isAdded =
+                                currentMovie != null &&
+                                    controller.myListController.isAdded(currentMovie);
+
+                            return GestureDetector(
+                              onTap: () {
+                                if (currentMovie != null) {
+                                  controller.myListController.addMovie(currentMovie);
+                                  Get.toNamed(AppRoutes.myList);
+                                }
+                              },
+                              child: Container(
+                                height: 50,
+                                width: 150,
+                                decoration: BoxDecoration(
+                                  color: greyColor,
+                                  borderRadius: BorderRadius.circular(5),
                                 ),
-                              ],
-                            ),
-                          ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isAdded ? Icons.check : Icons.list_alt,
+                                      color: whiteColor,
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      isAdded ? "Added" : "My List",
+                                      style: TextStyle(
+                                        color: whiteColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          })
                         ],
                       ),
                     ),
