@@ -1,20 +1,22 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
-
-import 'App/Modules/Splash/splash_binding.dart';
-import 'App/Modules/Splash/splash_view.dart';
+import 'App/Core/Bindings/initial_binding.dart';
 import 'App/Modules/Theme/theme.controller.dart';
 import 'App/Routes/app_pages.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  Get.put(ThemeController());
+  Get.put(ThemeController(),);
+
   if(kIsWeb){
     await Firebase.initializeApp(
         options: FirebaseOptions(
@@ -30,7 +32,15 @@ Future<void> main() async {
   }
   else{
   await Firebase.initializeApp();}
-  runApp(const MyApp());
+  FlutterError.onError =
+      FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  runZonedGuarded(() {
+    runApp(MyApp());
+  }, (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+  });
+  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -52,7 +62,7 @@ class MyApp extends StatelessWidget {
       //   ),
       // ),
       initialRoute: AppPages.initial,
-      initialBinding : SplashBinding(),
+      initialBinding : InitialBinding(),
       getPages: AppPages.routes,
     );
   }

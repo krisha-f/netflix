@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:netflix/App/Data/Services/utils.dart';
 import 'package:netflix/Constant/app_colors.dart';
 import 'package:netflix/Constant/app_size.dart';
+import '../../../Constant/app_strings.dart';
 import '../../Data/Models/hot_news_model.dart';
 import '../../Data/Services/apiservice.dart';
 import 'hotnews_controller.dart';
@@ -47,7 +48,7 @@ class HotNewsView extends GetView<HotNewsController> {
             // final movies = snapshot.data!.results;
             final movies = snapshot.data?.results ?? [];
             if (movies.isEmpty) {
-              return Center(child: Text("No Data Found"));
+              return Center(child: Text(noDataFound));
             }
             return ListView.builder(
               shrinkWrap: true,
@@ -89,7 +90,7 @@ class HotNewsView extends GetView<HotNewsController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              height: 300,
+                              height: cHeight3,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
                                     fit: BoxFit.cover,
@@ -99,7 +100,7 @@ class HotNewsView extends GetView<HotNewsController> {
                             SizedBox(height: size1,),
                             Row(
                               children: [
-                                Text("Coming On"),
+                                Text(comingOn),
                                 Text(
                                   hotNewsData.releaseDate == null
                                       ? firstAirDate
@@ -124,7 +125,7 @@ class HotNewsView extends GetView<HotNewsController> {
               },
             );
           } else {
-            return Center(child: Text("Problem To Fetch Data"));
+            return Center(child: Text(problemToFetchData));
           }
         },
       ),

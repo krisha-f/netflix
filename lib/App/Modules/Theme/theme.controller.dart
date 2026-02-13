@@ -10,7 +10,9 @@ class ThemeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
     isDark.value = box.read('isDark') ?? true;
+
     Get.changeThemeMode(
       isDark.value ? ThemeMode.dark : ThemeMode.light,
     );

@@ -9,6 +9,11 @@ environment:
   sdk: ^3.10.4
 
 
+#use google ml tootlkit for face detection and app open (real device)
+#add crashanalytics
+#use save form to google sheet (in firebase extension )
+#use storage(firebase) and local storage
+
 dependencies:
   flutter:
     sdk: flutter
@@ -25,6 +30,8 @@ dependencies:
   font_awesome_flutter:
   google_sign_in:
   get_storage:
+  image_picker:
+  firebase_crashlytics:
 
 dev_dependencies:
   flutter_test:

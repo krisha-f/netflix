@@ -1,18 +1,15 @@
 import 'dart:async';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_rx/src/rx_workers/rx_workers.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:netflix/App/Data/Services/utils.dart';
 import 'package:netflix/Constant/app_colors.dart';
 import 'package:netflix/Constant/app_size.dart';
-
+import '../../../Constant/app_strings.dart';
 import '../../Data/Models/search_movie_model.dart';
 import '../../Data/Models/trending_movie_model.dart';
 import '../../Data/Services/apiservice.dart';
@@ -98,7 +95,6 @@ class SearchView extends GetView<SearchController> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar( backgroundColor: Theme.of(context).scaffoldBackgroundColor, foregroundColor: whiteColor),
@@ -127,24 +123,21 @@ class SearchView extends GetView<SearchController> {
               future: treadingMoviesData,
               builder: (context, snapshot) {
 
-                // 🔵 1. Loading state
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
 
-                // 🔴 2. Error state
                 if (snapshot.hasError) {
                   return const Center(
                     child: Text(
-                      "Something went wrong",
-                      style: TextStyle(color: Colors.white),
+                      somethingWentWrong,
+                      style: TextStyle(color: whiteColor),
                     ),
                   );
                 }
 
-                // 🟢 3. No data
                 if (!snapshot.hasData || snapshot.data == null) {
                   return const SizedBox();
                 }
@@ -155,17 +148,16 @@ class SearchView extends GetView<SearchController> {
                 //   return const SizedBox();
                 // }
 
-                // ✅ 4. Success state
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Top Search",
-                      style: TextStyle(color: Colors.white),
+                      topSearch,
+                      style: TextStyle(color: whiteColor),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: size1),
                     SizedBox(
-                      height: 200,
+                      height: cHeight4,
                       child: ListView.builder(
                         physics: NeverScrollableScrollPhysics(),
                         scrollDirection: Axis.horizontal,
@@ -185,7 +177,7 @@ class SearchView extends GetView<SearchController> {
                                      );
                                    },
                                    child: Container(
-                                     height: 90,
+                                     height: cHeight5,
                                      decoration: BoxDecoration(
                                          borderRadius : BorderRadius.circular(20)
                                      ),
@@ -234,7 +226,7 @@ class SearchView extends GetView<SearchController> {
                               );
                             },
                             child: Container(
-                              height: 90,
+                              height: cHeight5,
                               decoration: BoxDecoration(
                                           borderRadius : BorderRadius.circular(20)
                                           ),

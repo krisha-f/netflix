@@ -3,9 +3,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:netflix/Constant/app_colors.dart';
 import 'package:netflix/Constant/app_size.dart';
+import 'package:netflix/Constant/app_strings.dart';
 import '../../Routes/app_pages.dart';
 import 'auth_controller.dart';
-import 'login_view.dart';
 
 class SignUpView extends GetView<AuthController> {
   const SignUpView({super.key});
@@ -13,7 +13,7 @@ class SignUpView extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Center(
@@ -21,35 +21,35 @@ class SignUpView extends GetView<AuthController> {
             child: Column(
               children: [
                 Text(
-                  "NETFLIX",
+                  netflix,
                   style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 32,
+                    color: redColor,
+                    fontSize: size4,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
 
 
-                SizedBox(height: 40),
+                SizedBox(height: size5),
 
                 Text(
-                  "Sign Up",
+                  signUp,
                   style: TextStyle(
                     color: whiteColor,
-                    fontSize: 32,
+                    fontSize: size4,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: size2),
 
                 TextField(
                   controller: controller.emailController,
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: whiteColor),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.grey[900],
-                    hintText: "Email",
-                    hintStyle: TextStyle(color: Colors.grey),
+                    fillColor: textFieldColor,
+                    hintText: email,
+                    hintStyle: TextStyle(color: greyColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(6),
                       borderSide: BorderSide.none,
@@ -57,17 +57,17 @@ class SignUpView extends GetView<AuthController> {
                   ),
                 ),
 
-                SizedBox(height: 16),
+                SizedBox(height: size6),
 
                 TextField(
                   controller: controller.passwordController,
                   obscureText: true,
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: whiteColor),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.grey[900],
-                    hintText: "Password",
-                    hintStyle: TextStyle(color: Colors.grey),
+                    fillColor: textFieldColor,
+                    hintText: password,
+                    hintStyle: TextStyle(color: greyColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(6),
                       borderSide: BorderSide.none,
@@ -75,22 +75,22 @@ class SignUpView extends GetView<AuthController> {
                   ),
                 ),
 
-                SizedBox(height: 24),
+                SizedBox(height: size7),
 
                 Obx(() => controller.isLoading.value
-                    ? CircularProgressIndicator(color: Colors.red)
+                    ? CircularProgressIndicator(color:redColor)
                     : SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: redColor,
                     ),
                     onPressed: controller.signup,
-                    child: Text("Sign In"),
+                    child: Text(signIn),
                   ),
                 )),
 
-                SizedBox(height: 20),
+                SizedBox(height: size2),
 
                 TextButton(
                   onPressed: () {
@@ -98,8 +98,8 @@ class SignUpView extends GetView<AuthController> {
                       AppRoutes.login,
                     );                  },
                   child: Text(
-                    "New to Netflix? Login In",
-                    style: TextStyle(color: Colors.white),
+                    newToNetflixLogin,
+                    style: TextStyle(color: whiteColor),
                   ),
                 ),
                 SizedBox(height: size3,),
@@ -114,7 +114,7 @@ class SignUpView extends GetView<AuthController> {
                     children: [
                       FaIcon(FontAwesomeIcons.google),
                       SizedBox(width: size1,),
-                      Text("log In With Google"),
+                      Text(logInWithGoogle),
                     ],
                   )),
                 ),

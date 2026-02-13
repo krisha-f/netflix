@@ -1,33 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../Constant/app_colors.dart';
+import '../../../Constant/app_strings.dart';
 import '../../Data/Services/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'mylist_controller.dart';
 
 class MyListView extends GetView<MyListController> {
-  MyListView({super.key});
-
-
+  const MyListView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: blackColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: blackColor,
-        title: Text("My List"),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          title: Text(myList),
       ),
       body: Obx(() {
         if (controller.myMovies.isEmpty) {
           return Center(
             child: Text(
-              "No Movies Added",
+              noMoviesAdded,
               style: TextStyle(color: whiteColor),
             ),
           );
         }
-
         return GridView.builder(
           padding: EdgeInsets.all(10),
           gridDelegate:
@@ -38,7 +36,6 @@ class MyListView extends GetView<MyListController> {
           itemCount: controller.myMovies.length,
           itemBuilder: (context, index) {
             final movie = controller.myMovies[index];
-
             return Padding(
               padding: const EdgeInsets.all(5),
               child: Container(

@@ -9,6 +9,5 @@ class HomeBindings extends Bindings {
   void dependencies() {
     Get.put<HomeController>(HomeController());
     Get.put<MyListController>(MyListController());
-
   }
 }

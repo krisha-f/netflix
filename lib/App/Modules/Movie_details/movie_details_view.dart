@@ -1,12 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:netflix/App/Data/Services/utils.dart';
 import 'package:netflix/Constant/app_size.dart';
 import '../../../Constant/app_colors.dart';
 import '../../../Constant/app_images.dart';
+import '../../../Constant/app_strings.dart';
 import 'movie_details_controller.dart';
 
 class MovieDetailsView extends GetView<MovieDetailsController> {
@@ -21,7 +20,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
         return "${hours}h ${minute}m";
     }
     return Scaffold(
-      backgroundColor: blackColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: FutureBuilder(
           future: controller.movieDetailsData,
@@ -31,7 +30,6 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                 child: CircularProgressIndicator(),
               );
             }
-
             if (snapshot.hasError) {
               print("ERROR: ${snapshot.error}");
               return Center(
@@ -41,7 +39,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
 
             if (!snapshot.hasData || snapshot.data == null) {
               return const Center(
-                child: Text("No Data Found"),
+                child: Text(noDataFound),
               );
             }
             if (snapshot.hasData) {
@@ -92,7 +90,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                         bottom: 100,
                         right: 100,
                         left: 100,
-                        child: Icon(Icons.play_circle_outline,color: whiteColor,size: 50,)),
+                        child: Icon(Icons.play_circle_outline,color: whiteColor,size: cHeight,)),
                     ],
                   ),
                   SizedBox(height: size1,),
@@ -113,7 +111,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                               ),
                             ),
                           ),
-                          Expanded(flex:2,child: Image.asset(splashLogo,height: 50,width: 100,))
+                          Expanded(flex:2,child: Image.asset(splashLogo,height: cHeight,width: cWidth2,))
                         ],
                       ),
                       Row(
@@ -128,7 +126,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                           SizedBox(width: size1,),
                           Text(formateRuntime(movie?.runtime ?? 0)),
                           SizedBox(width: size1,),
-                          Text("HD",   style: TextStyle(
+                          Text(hd,   style: TextStyle(
                             color: whiteColor,
                             fontWeight: FontWeight.bold,
                           ),)
@@ -153,7 +151,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                             ),
                           ),
                           child: const Text(
-                            "Play",
+                            playText,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
@@ -163,7 +161,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                       SizedBox(height: size1,),
                       SizedBox(
                         width: double.infinity,
-                        height: 50,
+                        height: cHeight,
                         child: ElevatedButton(
                           onPressed: () {
                           },
@@ -185,7 +183,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                               Icon(Icons.download,color: whiteColor,),
                               SizedBox(width: size1,),
                               const Text(
-                                "Download",
+                                download,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: whiteColor
@@ -219,7 +217,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                             children: [
                               Icon(Icons.add,color: whiteColor,),
                               SizedBox(height: size1),
-                              Text("My List",style: TextStyle(color: whiteColor,),)
+                              Text(myList,style: TextStyle(color: whiteColor,),)
                             ],
                           ),
                           SizedBox(width: size1,),
@@ -228,7 +226,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                               Icon(Icons.thumb_up,color: whiteColor,),
                               SizedBox(height: size1),
 
-                              Text("Rate",style: TextStyle(color: whiteColor,),)
+                              Text(rate,style: TextStyle(color: whiteColor,),)
                             ],
                           ),
                           SizedBox(width: size1,),
@@ -236,7 +234,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                             children: [
                               Icon(Icons.share,color: whiteColor,),
                               SizedBox(height: size1),
-                              Text("Share",style: TextStyle(color: whiteColor,),)
+                              Text(share,style: TextStyle(color: whiteColor,),)
                             ],
                           )
                         ],
@@ -274,24 +272,22 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                         future: controller.movieRecommendationsData,
                         builder: (context, snapshot) {
 
-                          // 🔵 1. Loading state
+
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return const Center(
                               child: CircularProgressIndicator(),
                             );
                           }
 
-                          // 🔴 2. Error state
                           if (snapshot.hasError) {
                             return const Center(
                               child: Text(
-                                "Something went wrong",
-                                style: TextStyle(color: Colors.white),
+                                somethingWentWrong,
+                                style: TextStyle(color: whiteColor),
                               ),
                             );
                           }
 
-                          // 🟢 3. No data
                           if (!snapshot.hasData || snapshot.data == null) {
                             return const SizedBox();
                           }
@@ -302,17 +298,16 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                             return const SizedBox();
                           }
 
-                          // ✅ 4. Success state
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                "More Like this",
-                                style: TextStyle(color: Colors.white),
+                                moreLikeThis,
+                                style: TextStyle(color: whiteColor),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: size1),
                               SizedBox(
-                                height: 200,
+                                height: cHeight4,
                                 child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   itemCount: movie.results!.length,
@@ -327,8 +322,8 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: CachedNetworkImage(
                                         imageUrl: "$imageUrl${item.posterPath}",
-                                        height: 200,
-                                        width: 130,
+                                        height: cHeight4,
+                                        width: cWidth1,
                                         fit: BoxFit.cover,
                                       ),
                                     );
@@ -345,7 +340,7 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                 ],
               );
             } else {
-              return Text("something went wrong");
+              return Text(somethingWentWrong);
             }
           },
         ),

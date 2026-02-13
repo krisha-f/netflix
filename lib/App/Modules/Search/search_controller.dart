@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-
 import '../../Data/Models/search_movie_model.dart';
 import '../../Data/Services/apiservice.dart';
 

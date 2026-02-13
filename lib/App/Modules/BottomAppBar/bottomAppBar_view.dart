@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
-import '../../../Constant/app_colors.dart';
 import '../../../Constant/app_size.dart';
 import '../../../Constant/app_strings.dart';
 import '../Home/home_view.dart';
@@ -18,7 +17,8 @@ class BottomAppbarView extends GetView<BottomAppbarController> {
       length: 4,
       child: Scaffold(
         bottomNavigationBar: Container(
-          color: blackColor,
+
+          color: Theme.of(context).scaffoldBackgroundColor,
           height: bottomBar,
           child: TabBar(
             tabs: [
@@ -27,9 +27,13 @@ class BottomAppbarView extends GetView<BottomAppbarController> {
               Tab(icon: Icon(Icons.library_add), text: hotNewsText),
               Tab(icon: Icon(Icons.person_2_rounded), text: profile),
             ],
-            unselectedLabelColor: greyColor,
-            labelColor: whiteColor,
-            indicatorColor: transparentColor,
+            // unselectedLabelColor: greyColor,
+            // labelColor: whiteColor,
+            // indicatorColor: transparentColor,
+            labelColor: Theme.of(context).colorScheme.primary,
+            unselectedLabelColor:
+            Theme.of(context).textTheme.bodyMedium!.color,
+            indicatorColor: Theme.of(context).colorScheme.primary,
           ),
         ),
         body: TabBarView(children: [

@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:netflix/App/Data/Services/utils.dart';
 
 import '../Models/hot_news_model.dart';
+import '../Models/movie_category_model.dart';
 import '../Models/movie_details_model.dart';
 import '../Models/movie_model.dart';
 import '../Models/movie_recommendation_model.dart';
@@ -182,6 +183,40 @@ class ApiService {
     }
     catch(e){
       throw Exception("Fetching error to find Hot News: $e");
+    }
+  }
+
+  Future<CategoryMovies?> categoryMovies() async{
+    try{
+      final endPoint= "genre/movie/list";
+      final apiUrl = "$baseUrl$endPoint$key";
+      final response = await http.get(Uri.parse(apiUrl));
+      if(response.statusCode == 200){
+        return CategoryMovies.fromJson(jsonDecode(response.body));      }
+      else{
+        throw Exception("Failed to Load Category Movies");
+      }
+    }
+    catch(e){
+      throw Exception("Fetching error to find Category Movies: $e");
+    }
+  }
+
+  Future<CategoryMovies?> fetchMoviesByGenre(int genreId) async {
+    try {
+      final endPoint = "discover/movie";
+      final apiUrl =
+          "$baseUrl$endPoint?api_key=$apiKey&with_genres=$genreId";
+
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        return CategoryMovies.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception("Failed to load genre movies");
+      }
+    } catch (e) {
+      throw Exception("Fetching error genre movies: $e");
     }
   }
 
