@@ -13,13 +13,16 @@ import 'hotnews_controller.dart';
 class HotNewsView extends GetView<HotNewsController> {
    HotNewsView({super.key});
 
-  late Future<HotNews?> hotNewsData;
 
   final ApiService apiService = ApiService();
+   // late final Future<HotNews?> hotNewsData =  apiService.hotNews();
 
-  void initState(){
-    hotNewsData = apiService.hotNews();
-  }
+   late Future<HotNews?> hotNewsData =  apiService.hotNews();
+
+
+   // void initState(){
+  //   hotNewsData = apiService.hotNews();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +41,7 @@ class HotNewsView extends GetView<HotNewsController> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar( backgroundColor: Theme.of(context).scaffoldBackgroundColor, foregroundColor: whiteColor),
       body: FutureBuilder(
-        future: controller.hotNewsData,
+        future: hotNewsData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());

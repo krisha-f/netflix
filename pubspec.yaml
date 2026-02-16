@@ -32,6 +32,8 @@ dependencies:
   get_storage:
   image_picker:
   firebase_crashlytics:
+  firebase_database:
+  firebase_storage:
 
 dev_dependencies:
   flutter_test:

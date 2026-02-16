@@ -1,3 +1,5 @@
+import 'movie_model.dart';
+
 class CategoryMovies {
   List<Genres>? genres;
 
@@ -37,5 +39,20 @@ class Genres {
     data['id'] = this.id;
     data['name'] = this.name;
     return data;
+  }
+}
+
+class GenreMovieResponse {
+  List<Results>? results;
+
+  GenreMovieResponse({this.results});
+
+  GenreMovieResponse.fromJson(Map<String, dynamic> json) {
+    if (json['results'] != null) {
+      results = <Results>[];
+      json['results'].forEach((v) {
+        results!.add(Results.fromJson(v));
+      });
+    }
   }
 }

@@ -7,15 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get_storage/get_storage.dart';
 import 'App/Core/Bindings/initial_binding.dart';
+import 'App/Data/Services/storage_service.dart';
 import 'App/Modules/Theme/theme.controller.dart';
 import 'App/Routes/app_pages.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  Get.put(ThemeController(),);
+  await Get.putAsync(() async => StorageService());
+  Get.put(ThemeController());
 
   if(kIsWeb){
     await Firebase.initializeApp(
@@ -48,23 +51,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: Get.find<ThemeController>().isDark.value
-          ? ThemeMode.dark
-          : ThemeMode.light,
-      title: 'Netflix',
-      debugShowCheckedModeBanner: false,
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(
-      //     seedColor: Colors.deepPurple,
-      //   ),
-      // ),
-      initialRoute: AppPages.initial,
-      initialBinding : InitialBinding(),
-      getPages: AppPages.routes,
-    );
+    // Find the ThemeController
+    final themeController = Get.find<ThemeController>();
+
+    // Use Obx to reactively rebuild when theme changes
+    return Obx(() {
+      return GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Netflix',
+        theme: ThemeData.light(),
+        darkTheme: ThemeData.dark(),
+        themeMode:
+        themeController.isDark.value ? ThemeMode.dark : ThemeMode.light,
+        initialBinding: InitialBinding(),
+        initialRoute: AppPages.initial,
+        getPages: AppPages.routes,
+      );
+    });
   }
 }
 

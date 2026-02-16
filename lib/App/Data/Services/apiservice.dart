@@ -202,26 +202,51 @@ class ApiService {
     }
   }
 
-  Future<CategoryMovies?> fetchMoviesByGenre(int genreId) async {
-    try {
-      final endPoint = "discover/movie";
-      final apiUrl =
-          "$baseUrl$endPoint?api_key=$apiKey&with_genres=$genreId";
+  // Future<CategoryMovies?> fetchMoviesByGenre(int genreId) async {
+  //   try {
+  //     final endPoint = "discover/movie";
+  //     final apiUrl =
+  //         "$baseUrl$endPoint?api_key=$apiKey&with_genres=$genreId";
+  //
+  //     final response = await http.get(Uri.parse(apiUrl));
+  //
+  //     if (response.statusCode == 200) {
+  //       return CategoryMovies.fromJson(jsonDecode(response.body));
+  //     } else {
+  //       throw Exception("Failed to load genre movies");
+  //     }
+  //   } catch (e) {
+  //     throw Exception("Fetching error genre movies: $e");
+  //   }
+  // }
 
-      final response = await http.get(Uri.parse(apiUrl));
+  Future<GenreMovieResponse> fetchMoviesByGenre(int genreId) async {
+    final url =
+        'https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&with_genres=$genreId';
 
-      if (response.statusCode == 200) {
-        return CategoryMovies.fromJson(jsonDecode(response.body));
-      } else {
-        throw Exception("Failed to load genre movies");
-      }
-    } catch (e) {
-      throw Exception("Fetching error genre movies: $e");
+    final response = await http.get(
+      Uri.parse(url),
+      // headers: {
+      //   "Accept": "application/json",
+      //   "Content-Type": "application/json",
+      // },
+      headers: {
+        "accept": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMjdkN2Q4NzljNzUwZWI4NTc0NzA1YWY5NDIzZjBlMiIsIm5iZiI6MTc3MDc4NTY1Ni43Mjk5OTk4LCJzdWIiOiI2OThjMGI3ODM1Y2I4YTFjMDgwOWMxYmIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.cZgkGU3EOHIH7PyIVLFCsVAFHOYzS7DEKXKfd0ENcvQ",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return GenreMovieResponse.fromJson(
+        jsonDecode(response.body),
+      );
+    } else {
+      throw Exception(
+          "Failed with status: ${response.statusCode}");
     }
   }
 
 }
-
 
 //movieid
 //query = harry

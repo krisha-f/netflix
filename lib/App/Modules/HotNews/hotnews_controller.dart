@@ -11,4 +11,5 @@ class HotNewsController extends GetxController {
     super.onInit();
     hotNewsData = apiService.hotNews();
   }
+
 }

@@ -4,6 +4,8 @@ import '../Modules/Auth/auth_binding.dart';
 import '../Modules/Auth/login_view.dart';
 import '../Modules/BottomAppBar/bottomAppBar_binding.dart';
 import '../Modules/BottomAppBar/bottomAppBar_view.dart';
+import '../Modules/Download/download_binding.dart';
+import '../Modules/Download/download_view.dart';
 import '../Modules/Home/home_binding.dart';
 import '../Modules/Home/home_view.dart';
 import '../Modules/HotNews/hotnews_binding.dart';
@@ -60,6 +62,9 @@ class AppPages {
         binding: HotNewsBinding()),
     GetPage(name: AppRoutes.myList,
         page: () =>  MyListView(),
-        binding: MyListBinding())
+        binding: MyListBinding()),
+    GetPage(name: AppRoutes.download,
+        page: () =>  DownloadView(),
+        binding: DownloadBinding())
   ];
 }

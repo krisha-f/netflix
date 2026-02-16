@@ -1,7 +1,7 @@
 
 class HotNews {
   int? page;
-  List<Results>? results;
+  List<Result>? results;
   int? totalPages;
   int? totalResults;
 
@@ -10,9 +10,9 @@ class HotNews {
   HotNews.fromJson(Map<String, dynamic> json) {
     page = json['page'];
     if (json['results'] != null) {
-      results = <Results>[];
+      results = <Result>[];
       json['results'].forEach((v) {
-        results!.add(new Results.fromJson(v));
+        results!.add(new Result.fromJson(v));
       });
     }
     totalPages = json['total_pages'];
@@ -27,7 +27,7 @@ class HotNews {
     // }
     if (data['results'] != null) {
       results = (data['results'] as List)
-          .map((e) => Results.fromJson(e))
+          .map((e) => Result.fromJson(e))
           .toList();
     } else {
       results = [];
@@ -38,7 +38,7 @@ class HotNews {
   }
 }
 
-class Results {
+class Result {
   bool? adult;
   String? backdropPath;
   int? id;
@@ -59,7 +59,7 @@ class Results {
   String? firstAirDate;
   List<String>? originCountry;
 
-  Results(
+  Result(
       {this.adult,
         this.backdropPath,
         this.id,
@@ -80,7 +80,7 @@ class Results {
         this.firstAirDate,
         this.originCountry});
 
-  Results.fromJson(Map<String, dynamic> json) {
+  Result.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];
     backdropPath = json['backdrop_path'];
     id = json['id'];
@@ -90,7 +90,7 @@ class Results {
     posterPath = json['poster_path'];
     mediaType = json['media_type'];
     originalLanguage = json['original_language'];
-    genreIds = json['genre_ids'].cast<int>();
+    genreIds = json['genre_ids'];
     popularity = json['popularity'];
     releaseDate = json['release_date'];
     video = json['video'];
@@ -99,7 +99,7 @@ class Results {
     name = json['name'];
     originalName = json['original_name'];
     firstAirDate = json['first_air_date'];
-    originCountry = json['origin_country'].cast<String>();
+    originCountry = json['origin_country'];
   }
 
   Map<String, dynamic> toJson() {

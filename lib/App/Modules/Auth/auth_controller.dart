@@ -5,12 +5,14 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:netflix/Constant/app_colors.dart';
 import '../../../Constant/app_strings.dart';
+import '../../Data/Services/storage_service.dart';
 import '../../Routes/app_pages.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   var isLoading = false.obs;
-  final box = GetStorage();
+  // final box = GetStorage();
+  final storage = Get.find<StorageService>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -24,8 +26,13 @@ class AuthController extends GetxController {
         password: passwordController.text.trim(),
       );
 
-      box.write(isLogIn, true);
-      box.write('userEmail', _auth.currentUser?.email);
+      storage.saveLoginStatus( true);
+      storage.saveUserEmail(_auth.currentUser?.email ?? '');
+
+      debugPrint("*************************");
+      debugPrint(_auth.currentUser?.email);
+      debugPrint("*************************");
+
 
       Get.offAllNamed(AppRoutes.bottomAppBar);
 
@@ -47,8 +54,8 @@ class AuthController extends GetxController {
         password: passwordController.text.trim(),
       );
 
-      box.write(isLogIn, true);
-      box.write('userEmail', _auth.currentUser?.email);
+      storage.saveLoginStatus(true);
+      storage.saveUserEmail( _auth.currentUser?.email?? '');
 
       Get.offAllNamed(AppRoutes.bottomAppBar);
 
@@ -94,9 +101,10 @@ class AuthController extends GetxController {
   }
 
   void logout() async {
+    // storage.saveLoginStatus(true);
     await _auth.signOut();
-    box.erase();
-    box.write(isLogIn, false);
+    // storage.clearAll();
+    storage.saveLoginStatus(true);
     Get.offAllNamed(AppRoutes.login);
   }
 }

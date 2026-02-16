@@ -1,37 +1,24 @@
 import 'dart:io';
 
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:netflix/App/Modules/Profile/profile_controller.dart';
 import 'package:netflix/Constant/app_colors.dart';
 import '../../../Constant/app_size.dart';
 import '../../../Constant/app_strings.dart';
+import '../../Data/Services/storage_service.dart';
 import '../../Routes/app_pages.dart';
+import '../Auth/auth_controller.dart';
 import '../MyList/mylist_controller.dart';
 import '../Theme/theme.controller.dart';
 
-class ProfileView extends StatelessWidget {
-  ProfileView({super.key});
+class ProfileView extends GetView<ProfileController>  {
+   ProfileView({super.key});
 
-  final themeController = Get.find<ThemeController>();
-  final myListController = Get.find<MyListController>();
-  // final authController = Get.find<AuthController>();
-  final box = GetStorage();
-  final ImagePicker _picker = ImagePicker();
-  RxString profileImagePath = ''.obs;
-  Future<void> pickImage() async {
-    final email = box.read('userEmail');
-    if (email == null) return;
-
-    final XFile? image =
-    await _picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      profileImagePath.value = image.path;
-      box.write(email, image.path);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,15 +34,18 @@ class ProfileView extends StatelessWidget {
                 children: [
                   Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: profileImagePath.value.isNotEmpty
-                            ? FileImage(File(profileImagePath.value))
-                            : null,
-                        child: profileImagePath.value.isEmpty
-                            ? Icon(Icons.person, size: 50)
-                            : null,
-                      ),
+              CircleAvatar(
+              radius: 50,
+                backgroundImage: controller.profileImagePath.value.isNotEmpty
+                    ? (controller.profileImagePath.value.startsWith('http')
+                    ? NetworkImage(controller.profileImagePath.value)
+                    : FileImage(File(controller.profileImagePath.value)))
+                as ImageProvider
+                    : null,
+                child: controller.profileImagePath.value.isEmpty
+                    ? const Icon(Icons.person, size: 50)
+                    : null,
+              ),
 
                       // 🔥 Positioned Edit Icon
                       Positioned(
@@ -63,7 +53,7 @@ class ProfileView extends StatelessWidget {
                         right: 0,
                         child: GestureDetector(
                           onTap: () {
-                           pickImage();
+                            controller.pickImage();
                           },
                           child: Container(
                             padding: EdgeInsets.all(6),
@@ -85,7 +75,7 @@ class ProfileView extends StatelessWidget {
                   SizedBox(height: 10),
 
                   Text(
-                    box.read('userEmail') ?? 'No Email',
+                    controller.storage.userEmail ?? 'No Email',
                     style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -108,9 +98,9 @@ class ProfileView extends StatelessWidget {
 
             Obx(() => SwitchListTile(
               title: Text(darkMode),
-              value: themeController.isDark.value,
+              value: controller.themeController.isDark.value,
               onChanged: (value) {
-                themeController.toggleTheme();
+                controller.themeController.toggleTheme();
               },
             )),
 
@@ -130,7 +120,8 @@ class ProfileView extends StatelessWidget {
                 style: TextStyle(color: redColor),
               ),
               onTap: () {
-                // authController.logout();
+                final authController = Get.put(AuthController());
+                authController.logout();
                 Get.offAllNamed(AppRoutes.login);
               },
             ),

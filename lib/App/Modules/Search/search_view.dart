@@ -160,7 +160,7 @@ class SearchView extends GetView<SearchController> {
                       height: cHeight4,
                       child: ListView.builder(
                         physics: NeverScrollableScrollPhysics(),
-                        scrollDirection: Axis.horizontal,
+                        scrollDirection: Axis.vertical,
                         itemCount: movie?.results?.length?? 0,
                         itemBuilder: (context, index) {
                           final topMovies = movie?.results?[index];

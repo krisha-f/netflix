@@ -13,4 +13,5 @@ abstract class AppRoutes{
   static const settings = "/settings";
   static const hotNews= "/hotNews";
   static const myList = "/myList";
+  static const download = "/download";
 }
