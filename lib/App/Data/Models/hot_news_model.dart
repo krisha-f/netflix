@@ -90,7 +90,8 @@ class Result {
     posterPath = json['poster_path'];
     mediaType = json['media_type'];
     originalLanguage = json['original_language'];
-    genreIds = json['genre_ids'];
+    // genreIds = json['genre_ids'];
+    genreIds = (json['genre_ids'] as List<dynamic>?)?.map((e) => e as int).toList();
     popularity = json['popularity'];
     releaseDate = json['release_date'];
     video = json['video'];
@@ -99,7 +100,9 @@ class Result {
     name = json['name'];
     originalName = json['original_name'];
     firstAirDate = json['first_air_date'];
-    originCountry = json['origin_country'];
+    originCountry = (json['origin_country'] as List<dynamic>?)?.map((e) => e as String).toList();
+
+    // originCountry = json['origin_country'];
   }
 
   Map<String, dynamic> toJson() {

@@ -33,7 +33,7 @@ class LoginView extends GetView<AuthController> {
                 Text(
                   logIn,
                   style: TextStyle(
-                    color: whiteColor,
+                    color: AppThemeHelper.textColor(context),
                     fontSize: size4,
                     fontWeight: FontWeight.bold,
                   ),
@@ -42,7 +42,7 @@ class LoginView extends GetView<AuthController> {
 
                 TextField(
                   controller: controller.emailController,
-                  style: TextStyle(color: whiteColor),
+                  style: TextStyle(color: AppThemeHelper.textColor(context)),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: textFieldColor,
@@ -60,7 +60,7 @@ class LoginView extends GetView<AuthController> {
                 TextField(
                   controller: controller.passwordController,
                   obscureText: true,
-                  style: TextStyle(color: whiteColor),
+                  style: TextStyle(color: AppThemeHelper.textColor(context)),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: textFieldColor,
@@ -94,11 +94,11 @@ class LoginView extends GetView<AuthController> {
 
                 TextButton(
                   onPressed: () {
-                    Get.offAllNamed(AppRoutes.signup);
+                    Get.toNamed(AppRoutes.signup);
                   },
                   child: Text(
                     newToNetflixSignup,
-                    style: TextStyle(color: whiteColor),
+                    style: TextStyle(color: AppThemeHelper.textColor(context)),
                   ),
                 ),
 
@@ -107,7 +107,7 @@ class LoginView extends GetView<AuthController> {
                   onPressed: () {
                     controller.signInWithGoogle;
                   },
-                  style: ElevatedButton.styleFrom(backgroundColor: whiteColor,shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(20)),elevation: 2.0,),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppThemeHelper.textColor(context),shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(20)),elevation: 2.0,),
                   child: Center(child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

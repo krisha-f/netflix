@@ -18,7 +18,12 @@ class DownloadView extends GetView<DownloadController> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        title: Text("Download"),),
+        title: Text("Download"),
+      leading: IconButton(icon: Icon(Icons.arrow_back,color: AppThemeHelper.textColor(context),),onPressed: (){
+        Get.back();
+      },),
+
+      ),
       body: Obx(() {
         final downloads =
             controller.downloadedMovies;

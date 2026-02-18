@@ -71,6 +71,8 @@ class DownloadController extends GetxController {
   RxList<movie.Results> downloadedMovies = <movie.Results>[].obs;
   RxBool isDownloading = false.obs;
   RxInt downloadingMovieId = (-1).obs;
+  String? get uid => FirebaseAuth.instance.currentUser?.uid;
+  String? get profileId => storage.selectedProfileId;
   // final uid = FirebaseAuth.instance.currentUser!.uid;
 
 
@@ -130,25 +132,40 @@ class DownloadController extends GetxController {
   //   }
   // }
 
+  // void addDownloadMovie(movie.Results movieData) {
+  //   final uid = FirebaseAuth.instance.currentUser?.uid;
+  //   if (uid == null) return;
+  //
+  //   if (!isDownloaded(movieData)) {
+  //     downloadedMovies.add(movieData);
+  //
+  //     database
+  //         .child("users/$uid/downloads/${movieData.id}")
+  //         .set(movieData.toJson());
+  //   } else {
+  //     downloadedMovies.removeWhere((m) => m.id == movieData.id);
+  //
+  //     database
+  //         .child("users/$uid/downloads/${movieData.id}")
+  //         .remove();
+  //   }
+  // }
+
+
   void addDownloadMovie(movie.Results movieData) {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
+    if (uid == null || profileId == null) return;
+
+    final ref = database.child(
+        "users/$uid/profiles/$profileId/downloads/${movieData.id}");
 
     if (!isDownloaded(movieData)) {
       downloadedMovies.add(movieData);
-
-      database
-          .child("users/$uid/downloads/${movieData.id}")
-          .set(movieData.toJson());
+      ref.set(movieData.toJson());
     } else {
       downloadedMovies.removeWhere((m) => m.id == movieData.id);
-
-      database
-          .child("users/$uid/downloads/${movieData.id}")
-          .remove();
+      ref.remove();
     }
   }
-
   bool isDownloaded(movie.Results movieData) {
     return downloadedMovies.any((m) => m.id == movieData.id);
   }
@@ -203,22 +220,44 @@ class DownloadController extends GetxController {
   //   }
   // }
 
-  Future<void> loadDownloadsFromFirebase() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
+  // Future<void> loadDownloadsFromFirebase() async {
+  //   final uid = FirebaseAuth.instance.currentUser?.uid;
+  //   if (uid == null) return;
+  //
+  //   final snapshot =
+  //   await database.child("users/$uid/downloads").get();
+  //
+  //   if (!snapshot.exists) return;
+  //
+  //   final value = snapshot.value;
+  //
+  //   if (value is Map) {
+  //     final data = Map<String, dynamic>.from(value);
+  //
+  //     downloadedMovies.assignAll(
+  //       data.values
+  //           .whereType<Map>()
+  //           .map((e) => movie.Results.fromJson(
+  //           Map<String, dynamic>.from(e)))
+  //           .toList(),
+  //     );
+  //   }
+  // }
 
-    final snapshot =
-    await database.child("users/$uid/downloads").get();
+  Future<void> loadDownloadsFromFirebase() async {
+    if (uid == null || profileId == null) return;
+    downloadedMovies.clear();
+    final snapshot = await database
+        .child("users/$uid/profiles/$profileId/downloads")
+        .get();
 
     if (!snapshot.exists) return;
 
     final value = snapshot.value;
 
     if (value is Map) {
-      final data = Map<String, dynamic>.from(value);
-
       downloadedMovies.assignAll(
-        data.values
+        value.values
             .whereType<Map>()
             .map((e) => movie.Results.fromJson(
             Map<String, dynamic>.from(e)))

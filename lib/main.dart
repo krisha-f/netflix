@@ -55,49 +55,43 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Find the ThemeController
     final themeController = Get.find<ThemeController>();
 
-    // Use Obx to reactively rebuild when theme changes
-
-      return GetMaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Netflix',
-        theme: ThemeData.light(),
-        darkTheme: ThemeData.dark(),
-        themeMode: ThemeMode.system,
-        // themeController.isDark.value ? ThemeMode.dark : ThemeMode.light,
-        initialBinding: InitialBinding(),
-        initialRoute: AppPages.initial,
-        getPages: AppPages.routes,
-      );
+    return Obx(() => GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Netflix',
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: themeController.isDark.value
+          ? ThemeMode.dark
+          : ThemeMode.light,
+      initialBinding: InitialBinding(),
+      initialRoute: AppPages.initial,
+      getPages: AppPages.routes,
+    ));
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key,});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(""),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            const Text(""),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     // Find the ThemeController
+//     // final themeController = Get.find<ThemeController>();
+//
+//     // Use Obx to reactively rebuild when theme changes
+//
+//       return GetMaterialApp(
+//         debugShowCheckedModeBanner: false,
+//         title: 'Netflix',
+//         theme: ThemeData.light(),
+//         darkTheme: ThemeData.dark(),
+//         themeMode: ThemeMode.system,
+//         // themeController.isDark.value ? ThemeMode.dark : ThemeMode.light,
+//         initialBinding: InitialBinding(),
+//         initialRoute: AppPages.initial,
+//         getPages: AppPages.routes,
+//       );
+//   }
+// }

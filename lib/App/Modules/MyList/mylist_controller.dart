@@ -10,39 +10,89 @@ class MyListController extends GetxController {
   final database = FirebaseDatabase.instance.ref();
 
   RxList<Results> myMovies = <Results>[].obs;
+  String? get uid => FirebaseAuth.instance.currentUser?.uid;
+  String? get profileId => storage.selectedProfileId;
+
+  // String? get profileId =>
+  //     Get.find<StorageService>().selectedProfileId;
+
 
   @override
   void onInit() {
     super.onInit();
-    loadLocalData();
-    syncWithFirebase();
+    loadMyListFromFirebase();
+    // loadLocalData();
+    // syncWithFirebase();
   }
 
-  void loadLocalData() {
-    final data = storage.getMyList();
+  // void loadLocalData() {
+  //   final data = storage.getMyList();
+  //
+  //   myMovies.assignAll(
+  //     data
+  //         .whereType<Map>()
+  //         .map((e) =>
+  //         Results.fromJson(Map<String, dynamic>.from(e)))
+  //         .toList(),
+  //   );
+  // }
 
-    myMovies.assignAll(
-      data
-          .whereType<Map>()
-          .map((e) =>
-          Results.fromJson(Map<String, dynamic>.from(e)))
-          .toList(),
-    );
-  }
+  Future<void> loadMyListFromFirebase() async {
+    if (uid == null || profileId == null) return;
 
-  void addMovie(Results movie) {
-    if (isAdded(movie)) {
-      myMovies.removeWhere((m) => m.id == movie.id);
-    } else {
-      myMovies.add(movie);
+    final snapshot = await database
+        .child("users/$uid/profiles/$profileId/myList")
+        .get();
+
+    if (!snapshot.exists) {
+      myMovies.clear();
+      return;
     }
 
-    storage.saveMyList(
-        myMovies.map((e) => e.toJson()).toList());
+    final value = snapshot.value;
 
-    saveToFirebase();
+    if (value is Map) {
+      myMovies.assignAll(
+        value.values
+            .whereType<Map>()
+            .map((e) =>
+            Results.fromJson(Map<String, dynamic>.from(e)))
+            .toList(),
+      );
+    } else {
+      debugPrint(
+          "myList is not Map. It is ${value.runtimeType}");
+    }
   }
 
+  // void addMovie(Results movie) {
+  //   if (isAdded(movie)) {
+  //     myMovies.removeWhere((m) => m.id == movie.id);
+  //   } else {
+  //     myMovies.add(movie);
+  //   }
+  //
+  //   storage.saveMyList(
+  //       myMovies.map((e) => e.toJson()).toList());
+  //
+  //   saveToFirebase();
+  // }
+
+
+  void addMovie(Results movie) {
+    if (uid == null || profileId == null) return;
+
+    final ref = database.child(
+        "users/$uid/profiles/$profileId/myList/${movie.id}");
+
+    if (isAdded(movie)) {
+      myMovies.removeWhere((m) => m.id == movie.id);
+      ref.remove();
+    } else {
+      myMovies.add(movie);
+      ref.set(movie.toJson());
+    }
+  }
   bool isAdded(Results movie) {
     return myMovies.any((m) => m.id == movie.id);
   }
@@ -51,38 +101,38 @@ class MyListController extends GetxController {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    database.child("users/$uid/myList").set(
+    database.child("users/$uid/profiles/$profileId/myList").set(
       myMovies.map((e) => e.toJson()).toList(),
     );
   }
 
-  Future<void> syncWithFirebase() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
-
-    final snapshot =
-    await database.child("users/$uid/myList").get();
-
-    if (!snapshot.exists) return;
-
-    final value = snapshot.value;
-
-    if (value is List) {
-      final safeList = value
-          .whereType<Map>()
-          .map((e) =>
-          Results.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
-
-      myMovies.assignAll(safeList);
-
-      storage.saveMyList(
-          safeList.map((e) => e.toJson()).toList());
-    } else {
-      debugPrint(
-          "myList is not a List. It is ${value.runtimeType}");
-    }
-  }
+  // Future<void> syncWithFirebase() async {
+  //   final uid = FirebaseAuth.instance.currentUser?.uid;
+  //   if (uid == null) return;
+  //
+  //   final snapshot =
+  //   await database.child("users/$uid/myList").get();
+  //
+  //   if (!snapshot.exists) return;
+  //
+  //   final value = snapshot.value;
+  //
+  //   if (value is List) {
+  //     final safeList = value
+  //         .whereType<Map>()
+  //         .map((e) =>
+  //         Results.fromJson(Map<String, dynamic>.from(e)))
+  //         .toList();
+  //
+  //     myMovies.assignAll(safeList);
+  //
+  //     storage.saveMyList(
+  //         safeList.map((e) => e.toJson()).toList());
+  //   } else {
+  //     debugPrint(
+  //         "myList is not a List. It is ${value.runtimeType}");
+  //   }
+  // }
 }
 
 

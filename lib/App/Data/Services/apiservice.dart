@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:netflix/App/Data/Services/utils.dart';
 
@@ -175,6 +176,10 @@ class ApiService {
       final endPoint= "trending/all/day";
       final apiUrl = "$baseUrl$endPoint$key";
       final response = await http.get(Uri.parse(apiUrl));
+      debugPrint("*************************");
+      debugPrint(response.toString());
+      debugPrint("*************************");
+
       if(response.statusCode == 200){
         return HotNews.fromJson(jsonDecode(response.body));      }
       else{

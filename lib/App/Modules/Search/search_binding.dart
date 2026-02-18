@@ -7,8 +7,8 @@ class SearchBinding extends Bindings {
   @override
   void dependencies() {
     // Get.put<SearchController>(SearchController());
-    // Get.lazyPut<SearchController>(() => SearchController());
-    Get.put(SearchController());
+    Get.lazyPut<CustomSearchController>(() => CustomSearchController());
+    // Get.put(CustomSearchController());
 
   }
 }

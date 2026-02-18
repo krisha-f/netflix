@@ -3,10 +3,15 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:netflix/App/Routes/app_pages.dart';
 
 import '../../Data/Services/storage_service.dart';
+import '../Download/download_controller.dart';
+import '../MyList/mylist_controller.dart';
 import '../Theme/theme.controller.dart';
 
 class ProfileController extends GetxController {
@@ -20,6 +25,18 @@ class ProfileController extends GetxController {
   RxString userEmail = ''.obs;
   // RxString themeMode = ''.obs;
   RxBool themeMode = false.obs;
+  String? get uid => FirebaseAuth.instance.currentUser?.uid;
+  String? get profileId => storage.selectedProfileId;
+
+  RxString selectedProfileId = ''.obs;
+
+  RxString profileName = 'Main'.obs;
+  RxList<Map<String, dynamic>> profiles = <Map<String, dynamic>>[].obs;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // RxString tempImageBase64 = ''.obs;
+  final nameController = TextEditingController();
+  RxString imageBase64 = ''.obs;
+
 
   @override
   void onInit() {
@@ -32,8 +49,7 @@ class ProfileController extends GetxController {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    final XFile? image =
-    await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
     if (image == null) return;
 
@@ -44,12 +60,29 @@ class ProfileController extends GetxController {
     final base64Image = base64Encode(bytes);
 
     // Save in Realtime Database
-    await database.child("users/$uid/profile").update({
+    // await database.child("users/$uid/profile").update({
+    //   "imageBase64": base64Image,
+    // });
+    if (uid == null || profileId == null) return;
+
+    await database.child("users/$uid/profiles/$profileId").update({
       "imageBase64": base64Image,
     });
 
     profileImageBase64.value = base64Image;
+
+    profileImageBase64.value = base64Image;
   }
+
+  // Future<void> pickImageForCreateProfile() async {
+  //   final XFile? image =
+  //   await _picker.pickImage(source: ImageSource.gallery);
+  //
+  //   if (image == null) return;
+  //
+  //   final bytes = await File(image.path).readAsBytes();
+  //   tempImageBase64.value = base64Encode(bytes);
+  // }
 
   // Future<void> saveTheme(String theme) async {
   //   final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -66,9 +99,7 @@ class ProfileController extends GetxController {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    await database.child("users/$uid").update({
-      "theme": isDark,
-    });
+    await database.child("users/$uid").update({"theme": isDark});
 
     themeMode.value = isDark;
   }
@@ -90,31 +121,292 @@ class ProfileController extends GetxController {
   //   }
   // }
 
+  // Future<void> loadProfileData() async {
+  //   final uid = FirebaseAuth.instance.currentUser?.uid;
+  //   if (uid == null) return;
+  //
+  //   final snapshot = await database.child("users/$uid").get();
+  //
+  //   if (!snapshot.exists) return;
+  //
+  //   final data = snapshot.value;
+  //
+  //   if (data is Map) {
+  //     final map = Map<String, dynamic>.from(data);
+  //
+  //     // userEmail.value = map["email"] ?? "";
+  //     //
+  //     // themeMode.value = map["theme"] ?? "light";
+  //     //
+  //     // if (map["profile"] != null &&
+  //     //     map["profile"]["imageBase64"] != null) {
+  //     //   profileImageBase64.value =
+  //     //   map["profile"]["imageBase64"];
+  //     // }
+  //
+  //     if (data is Map) {
+  //       final map = Map<String, dynamic>.from(data);
+  //
+  //       profileImageBase64.value =
+  //           map["imageBase64"] ?? "";
+  //
+  //       userEmail.value =
+  //           FirebaseAuth.instance.currentUser?.email ?? "";
+  //     }
+  //
+  //   }
+  // }
+
+  // Future<void> createProfile(String name, String avatar) async {
+  //   if (uid == null) return;
+  //
+  //   final newRef =
+  //   database.child("users/$uid/profiles").push();
+  //
+  //   await newRef.set({
+  //     "name": name,
+  //     "avatar": avatar,
+  //     "myList": [],
+  //     "downloads": [],
+  //   });
+  //
+  //   await loadProfileData();
+  // }
+  //
+  // Future<void> deleteProfile(String profileId) async {
+  //   if (uid == null) return;
+  //
+  //   await database
+  //       .child("users/$uid/profiles/$profileId")
+  //       .remove();
+  //
+  //   await loadProfileData();
+  // }
+  //
+  // void switchProfile(String profileId) {
+  //   storage.saveSelectedProfile(profileId);
+  //   Get.toNamed(AppRoutes.home);
+  // }
+
+  // ✅ LOAD ALL PROFILES
   Future<void> loadProfileData() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    final snapshot = await database.child("users/$uid").get();
+    final snapshot = await database.child("users/$uid/profiles").get();
 
-    if (!snapshot.exists) return;
+    profiles.clear();
 
-    final data = snapshot.value;
+    if (snapshot.exists) {
+      final data = Map<String, dynamic>.from(snapshot.value as Map);
 
-    if (data is Map) {
-      final map = Map<String, dynamic>.from(data);
+      data.forEach((key, value) {
+        final map = Map<String, dynamic>.from(value);
+        map["id"] = key;
+        profiles.add(map);
+      });
+    }
+    storage.saveSelectedProfile(profiles.last["id"]);
+    final savedId = storage.getSelectedProfile();
 
-      userEmail.value = map["email"] ?? "";
+    if (savedId != null &&
+        profiles.any((p) => p["id"] == savedId)) {
+      selectedProfileId.value = savedId;
+    } else if (profiles.length == 1) {
+      //  If only 1 profile → auto select
+      final onlyId = profiles.first["id"];
+      selectedProfileId.value = onlyId;
+      storage.saveSelectedProfile(onlyId);
+    } else {
+      selectedProfileId.value = "";
+    }
 
-      themeMode.value = map["theme"] ?? "light";
+    // If no profile → create default Main
+    if (profiles.isEmpty) {
+      await createProfile("Main", "");
+    }
 
-      if (map["profile"] != null &&
-          map["profile"]["imageBase64"] != null) {
-        profileImageBase64.value =
-        map["profile"]["imageBase64"];
-      }
+    // Auto select first if none selected
+    if (selectedProfileId.value.isEmpty) {
+      selectedProfileId.value = profiles.first["id"];
+      await switchProfile(selectedProfileId.value);
     }
   }
+
+  // CREATE PROFILE
+  Future<void> createProfile(String name, String imageBase64) async {
+    if (uid == null) return;
+
+    final newRef = database.child("users/$uid/profiles").push();
+
+    final id = newRef.key!;
+
+    await newRef.set({
+      "id": id,
+      "name": name,
+      "imageBase64": imageBase64,
+      "myList": [],
+      "downloads": [],
+    });
+
+    await loadProfileData();
+  }
+
+  // SWITCH PROFILE
+  Future<void> switchProfile(String id) async {
+    if (uid == null) return;
+    if (id == selectedProfileId.value) return;
+
+    selectedProfileId.value = id;
+    storage.saveSelectedProfile(id);
+    await database.child("users/$uid/selectedProfileId").set(id);
+
+    final snapshot = await database.child("users/$uid/profiles/$id").get();
+
+    if (snapshot.exists) {
+      final data = Map<String, dynamic>.from(snapshot.value as Map);
+
+      profileName.value = data["name"] ?? "Main";
+      profileImageBase64.value = data["imageBase64"] ?? "";
+    }
+
+    //  RELOAD DATA FOR NEW PROFILE
+    await Get.find<DownloadController>()
+        .loadDownloadsFromFirebase();
+
+    await Get.find<MyListController>()
+        .loadMyListFromFirebase();
+  }
+
+  // ✅ DELETE PROFILE
+  // Future<void> deleteProfile(String id) async {
+  //   if (uid == null) return;
+  //
+  //   await database.child("users/$uid/profiles/$id").remove();
+  //
+  //   await loadProfileData();
+  // }
+
+  Future<void> deleteProfile(String id) async {
+    if (uid == null) return;
+
+    //  If only 1 profile exists
+    if (profiles.length <= 1) {
+
+      Get.snackbar(
+        "Cannot Delete",
+        "Last profile cannot be deleted. Logging out...",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      await Future.delayed(Duration(seconds: 1));
+      await _auth.signOut();
+      // storage.clearAll();
+      // storage.saveLoginStatus(true);
+      storage.clearAll();
+      storage.saveLoginStatus(false);
+      SystemNavigator.pop();
+      // storage.clearAll();
+      // Get.toNamed(AppRoutes.login);
+      // await FirebaseAuth.instance.signOut();
+      //
+      // Get.toNamed(AppRoutes.login);
+
+      return;
+    }
+
+
+      // Delete normally if more than 1
+      await database
+          .child("users/$uid/profiles/$id")
+          .remove();
+
+      // If deleted profile was selected → switch to first
+      if (selectedProfileId.value == id) {
+        final remainingProfiles =
+        profiles.where((p) => p["id"] != id).toList();
+
+        if (remainingProfiles.isNotEmpty) {
+          // await switchProfile(remainingProfiles.first["id"]);
+          final newId = remainingProfiles.first["id"];
+          await switchProfile(newId);
+          await Get.find<MyListController>().loadMyListFromFirebase();
+          await Get.find<DownloadController>().loadDownloadsFromFirebase();
+        }
+      }
+
+
+    await loadProfileData();
+  }
+
+  // EDIT PROFILE
+  Future<void> editProfile(String id, String name, String imageBase64) async {
+    if (uid == null) return;
+
+    await database.child("users/$uid/profiles/$id").update({
+      "name": name,
+      "imageBase64": imageBase64,
+    });
+
+    await loadProfileData();
+  }
+
+
+
+  // /// PICK IMAGE
+  // Future<void> pickImage() async {
+  // final XFile? image =
+  // await _picker.pickImage(source: ImageSource.gallery);
+  //
+  // if (image == null) return;
+  //
+  // final bytes = await File(image.path).readAsBytes();
+  // imageBase64.value = base64Encode(bytes);
+  // }
+
+  /// UPDATE PROFILE
+  Future<void> updateProfile() async {
+  if (uid == null) return;
+
+  await database
+      .child("users/$uid/profiles/$profileId")
+      .update({
+  "name": nameController.text.trim(),
+  "imageBase64": imageBase64.value,
+  });
+
+  /// Reload main controller
+  await Get.find<ProfileController>()
+      .loadProfileData();
+
+  Get.back();
+  }
+
+
+
+
+
+
+
+
 }
+
+
+//pending :
+
+// edit get problem
+//also ui
+
+
+
+//not delete all profile 1 still then if this 1 deleted then snackbar popup give logout plz
+//when 1 profile then consider this current profile logic
+//when craete profile so current profile is consider new profile
+//edit
+//current profile store in firebase
+//add profile ui update
+//main profile screen update
+
+//update login signup for new screen
 
 
 

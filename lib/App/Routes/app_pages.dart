@@ -1,9 +1,14 @@
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/bindings_interface.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:netflix/App/Modules/Auth/signup_view.dart';
 import '../Modules/Auth/auth_binding.dart';
 import '../Modules/Auth/login_view.dart';
 import '../Modules/BottomAppBar/bottomAppBar_binding.dart';
 import '../Modules/BottomAppBar/bottomAppBar_view.dart';
+import '../Modules/CreateProfileSelection/create_profile_selection_controller.dart';
+import '../Modules/CreateProfileSelection/create_profile_selection_view.dart';
 import '../Modules/Download/download_binding.dart';
 import '../Modules/Download/download_view.dart';
 import '../Modules/Home/home_binding.dart';
@@ -65,6 +70,13 @@ class AppPages {
         binding: MyListBinding()),
     GetPage(name: AppRoutes.download,
         page: () =>  DownloadView(),
-        binding: DownloadBinding())
+        binding: DownloadBinding()),
+    GetPage(
+      name: AppRoutes.profileSelection,
+      page: () => const ProfileSelectionView(),
+      binding: BindingsBuilder(() {
+        Get.put(ProfileSelectionController());
+      }),
+    ),
   ];
 }

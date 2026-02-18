@@ -86,18 +86,67 @@ class StorageService extends GetxService {
     _box.write('isDark', value);
   }
 
-  // ---------------- MY LIST ----------------
-  List getMyList() => _box.read('myList') ?? [];
+  // ---------------- SELECTED PROFILE ----------------
+  // String? get selectedProfileId => _box.read('selectedProfileId');
+  //
+  // void saveSelectedProfile(String profileId) {
+  //   _box.write('selectedProfileId', profileId);
+  // }
 
-  void saveMyList(List data) {
-    _box.write('myList', data);
+  String? get selectedProfileId =>
+      _box.read("selectedProfileId");
+
+  void saveSelectedProfile(String id) {
+    _box.write("selectedProfileId", id);
+  }
+  String? getSelectedProfile() {
+    return _box.read('selectedProfileId');
   }
 
+
+  void clearSelectedProfile() {
+    _box.remove('selectedProfileId');
+  }
+
+
+  // ---------------- MY LIST ----------------
+  // List getMyList() => _box.read('myList') ?? [];
+  //
+  // void saveMyList(List data) {
+  //   _box.write('myList', data);
+  // }
+
+  List getMyList() {
+    final profileId = selectedProfileId;
+    if (profileId == null) return [];
+    return _box.read('myList_$profileId') ?? [];
+  }
+
+  void saveMyList(List data) {
+    final profileId = selectedProfileId;
+    if (profileId == null) return;
+    _box.write('myList_$profileId', data);
+  }
+
+
+
   // ---------------- DOWNLOADS ----------------
-  List getDownloads() => _box.read('downloads') ?? [];
+  // List getDownloads() => _box.read('downloads') ?? [];
+  //
+  // void saveDownloads(List data) {
+  //   _box.write('downloads', data);
+  // }
+
+  List getDownloads() {
+    final profileId = selectedProfileId;
+    if (profileId == null) return [];
+    return _box.read('downloads_$profileId') ?? [];
+  }
 
   void saveDownloads(List data) {
-    _box.write('downloads', data);
+    final profileId = selectedProfileId;
+    if (profileId == null) return;
+    _box.write('downloads_$profileId', data);
   }
 
   // ---------------- PROFILE IMAGE ----------------

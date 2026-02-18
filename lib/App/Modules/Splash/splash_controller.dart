@@ -19,9 +19,9 @@ class SplashController extends GetxController {
     bool isLoggedIn = box.read('isLoggedIn') ?? false;
 
     if (isLoggedIn) {
-      Get.offAllNamed(AppRoutes.bottomAppBar);
+      Get.toNamed(AppRoutes.bottomAppBar);
     } else {
-      Get.offAllNamed(AppRoutes.login);
+      Get.toNamed(AppRoutes.login);
     }
   }
 

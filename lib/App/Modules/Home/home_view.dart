@@ -50,7 +50,7 @@ class HomeView extends GetView<HomeController> {
                    const Spacer(),
                    IconButton(
                      onPressed: () {
-                       Get.offAllNamed(
+                       Get.toNamed(
                          AppRoutes.search,
                        );
                      },
@@ -58,7 +58,7 @@ class HomeView extends GetView<HomeController> {
                    ),
                    IconButton(
                      onPressed: () {
-                       Get.offAllNamed(
+                       Get.toNamed(
                          AppRoutes.download,
                        );
                      },
@@ -131,7 +131,7 @@ class HomeView extends GetView<HomeController> {
                    //   ),
                    // ),
                    Obx(() => PopupMenuButton<Genres>(
-                     color: Colors.black,
+                     color: AppThemeHelper.reverseTextColor(context),
                      onSelected: (Genres genre) {
                        debugPrint("GENRE CLICKED: ${genre.name}");
                        controller.selectGenre(genre);
@@ -146,7 +146,7 @@ class HomeView extends GetView<HomeController> {
                            value: genre,
                            child: Text(
                              genre.name ?? "",
-                             style: TextStyle(color: Colors.white),
+                             style: TextStyle(color:  AppThemeHelper.textColor(context)),
                            ),
                          );
                        }).toList();
@@ -157,9 +157,9 @@ class HomeView extends GetView<HomeController> {
                          children: [
                            Text(
                              controller.selectedGenre.value?.name ?? "Categories",
-                             style: TextStyle(color: Colors.white,fontSize: size2),
+                             style: TextStyle(color:  AppThemeHelper.textColor(context),fontSize: size2),
                            ),
-                           Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                           Icon(Icons.keyboard_arrow_down, color:  AppThemeHelper.textColor(context)),
                          ],
                        ),
                      ),
@@ -207,11 +207,14 @@ class HomeView extends GetView<HomeController> {
                             borderRadius: BorderRadius.circular(20),
                             child: PageView.builder(
                               itemCount: movies?.length,
+                                onPageChanged: (index) {
+                                  controller.currentMovie.value = movies![index];
+                                },
                               itemBuilder: (context, index) {
                                 final moviesDatas = movies![index];
                                 return GestureDetector(
                                   onTap: () {
-                                    Get.offAllNamed(
+                                    Get.toNamed(
                                       AppRoutes.movieDetails,
                                       arguments: moviesDatas.id,
                                     );

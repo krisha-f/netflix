@@ -14,6 +14,7 @@ class ThemeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    reloadThemeAfterLogin();
     loadTheme();
   }
 

@@ -1,10 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../../Data/Models/search_movie_model.dart';
 import '../../Data/Models/trending_movie_model.dart';
 import '../../Data/Services/apiservice.dart';
 
-class SearchController extends GetxController {
+class CustomSearchController extends GetxController {
   final ApiService apiService = ApiService();
+  final TextEditingController sController = TextEditingController();
 
   Rx<SearchMovies?> searchMovie = Rx<SearchMovies?>(null);
   RxBool isSearching = false.obs;
