@@ -15,10 +15,10 @@ import 'App/Modules/Theme/theme.controller.dart';
 import 'App/Routes/app_pages.dart';
 
 Future<void> main() async {
+  runZonedGuarded(() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  await Get.putAsync(() async => StorageService());
-  Get.put(ThemeController());
+
 
   if(kIsWeb){
     await Firebase.initializeApp(
@@ -35,10 +35,14 @@ Future<void> main() async {
   }
   else{
   await Firebase.initializeApp();}
+
+  await Get.putAsync(() async => StorageService());
+  Get.put(ThemeController());
+
   FlutterError.onError =
       FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  runZonedGuarded(() {
+
     runApp(MyApp());
   }, (error, stack) {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
@@ -55,19 +59,18 @@ class MyApp extends StatelessWidget {
     final themeController = Get.find<ThemeController>();
 
     // Use Obx to reactively rebuild when theme changes
-    return Obx(() {
+
       return GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Netflix',
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
-        themeMode:
-        themeController.isDark.value ? ThemeMode.dark : ThemeMode.light,
+        themeMode: ThemeMode.system,
+        // themeController.isDark.value ? ThemeMode.dark : ThemeMode.light,
         initialBinding: InitialBinding(),
         initialRoute: AppPages.initial,
         getPages: AppPages.routes,
       );
-    });
   }
 }
 

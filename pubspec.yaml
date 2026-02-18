@@ -28,7 +28,7 @@ dependencies:
   firebase_core:
   firebase_auth:
   font_awesome_flutter:
-  google_sign_in:
+  google_sign_in: ^7.0.0
   get_storage:
   image_picker:
   firebase_crashlytics:

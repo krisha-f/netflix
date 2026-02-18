@@ -101,30 +101,50 @@ class DownloadController extends GetxController {
     );
   }
 
+  // void addDownloadMovie(movie.Results movieData) {
+  //   // final email = storage.userEmail;
+  //   if (uid == null) return;
+  //
+  //   debugPrint("********************");
+  //   // debugPrint(email);
+  //   debugPrint("********************");
+  //
+  //   // if (email == null) return;
+  //
+  //   if (!isDownloaded(movieData)) {
+  //     downloadedMovies.add(movieData);
+  //
+  //     // 🔥 Save in Firebase using movieId as key
+  //     // database
+  //     //     .child("users/$email/downloads/${movieData.id}")
+  //     //     .set(movieData.toJson());
+  //
+  //     database.child("users/$uid/downloads/${movieData.id}").set(movieData.toJson());
+  //
+  //   } else {
+  //     downloadedMovies.removeWhere((m) => m.id == movieData.id);
+  //
+  //     database
+  //         .child("users/$uid/downloads/${movieData.id}")
+  //         .remove();
+  //   }
+  // }
+
   void addDownloadMovie(movie.Results movieData) {
-    final email = storage.userEmail;
-
-    debugPrint("********************");
-    debugPrint(email);
-    debugPrint("********************");
-
-    if (email == null) return;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
 
     if (!isDownloaded(movieData)) {
       downloadedMovies.add(movieData);
 
-      // 🔥 Save in Firebase using movieId as key
-      // database
-      //     .child("users/$email/downloads/${movieData.id}")
-      //     .set(movieData.toJson());
-
-      database.child("users/$email/downloads/${movieData.id}").set(movieData.toJson());
-
+      database
+          .child("users/$uid/downloads/${movieData.id}")
+          .set(movieData.toJson());
     } else {
       downloadedMovies.removeWhere((m) => m.id == movieData.id);
 
       database
-          .child("users/$email/downloads/${movieData.id}")
+          .child("users/$uid/downloads/${movieData.id}")
           .remove();
     }
   }
@@ -133,20 +153,75 @@ class DownloadController extends GetxController {
     return downloadedMovies.any((m) => m.id == movieData.id);
   }
 
+  // Future<void> loadDownloadsFromFirebase() async {
+  //   final email = storage.userEmail;
+  //   if (email == null) return;
+  //
+  //   final snapshot =
+  //   await database.child("users/$email/downloads").get();
+  //
+  //   if (snapshot.exists) {
+  //     final data = Map<String, dynamic>.from(snapshot.value as Map);
+  //
+  //     downloadedMovies.assignAll(
+  //       data.values
+  //           .map((e) =>
+  //           movie.Results.fromJson(Map<String, dynamic>.from(e)))
+  //           .toList(),
+  //     );
+  //   }
+  // }
+
+  // Future<void> loadDownloadsFromFirebase() async {
+  //   final uid = FirebaseAuth.instance.currentUser?.uid;
+  //   if (uid == null) return;
+  //
+  //   // final email = storage.userEmail;
+  //   // if (email == null) return;
+  //
+  //   final snapshot =
+  //   await database.child("users/$uid/downloads").get();
+  //
+  //   if (!snapshot.exists) return;
+  //
+  //   final value = snapshot.value;
+  //
+  //   if (value is Map) {
+  //     final data = Map<String, dynamic>.from(value);
+  //
+  //     downloadedMovies.assignAll(
+  //       data.values.map((e) {
+  //         if (e is Map) {
+  //           return movie.Results.fromJson(
+  //               Map<String, dynamic>.from(e));
+  //         }
+  //         return null;
+  //       }).whereType<movie.Results>().toList(),
+  //     );
+  //   } else {
+  //     print("Downloads is not a Map. It is ${value.runtimeType}");
+  //   }
+  // }
+
   Future<void> loadDownloadsFromFirebase() async {
-    final email = storage.userEmail;
-    if (email == null) return;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
 
     final snapshot =
-    await database.child("users/$email/downloads").get();
+    await database.child("users/$uid/downloads").get();
 
-    if (snapshot.exists) {
-      final data = Map<String, dynamic>.from(snapshot.value as Map);
+    if (!snapshot.exists) return;
+
+    final value = snapshot.value;
+
+    if (value is Map) {
+      final data = Map<String, dynamic>.from(value);
 
       downloadedMovies.assignAll(
         data.values
-            .map((e) =>
-            movie.Results.fromJson(Map<String, dynamic>.from(e)))
+            .whereType<Map>()
+            .map((e) => movie.Results.fromJson(
+            Map<String, dynamic>.from(e)))
             .toList(),
       );
     }

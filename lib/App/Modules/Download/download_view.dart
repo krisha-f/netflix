@@ -16,7 +16,9 @@ class DownloadView extends GetView<DownloadController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(title: Text("Download"),leading: GestureDetector(onTap: (){AppRoutes.home;},child: Icon(Icons.arrow_back_ios_new,color: whiteColor,size: 15,),),),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: Text("Download"),),
       body: Obx(() {
         final downloads =
             controller.downloadedMovies;

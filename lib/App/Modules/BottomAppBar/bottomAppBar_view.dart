@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
 import '../../../Constant/app_size.dart';
 import '../../../Constant/app_strings.dart';
@@ -37,6 +39,7 @@ class BottomAppbarView extends GetView<BottomAppbarController> {
           ),
         ),
         body: TabBarView(children: [
+
           HomeView(),
           SearchView(),
           HotNewsView(),

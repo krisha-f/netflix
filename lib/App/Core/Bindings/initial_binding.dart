@@ -31,7 +31,7 @@ class InitialBinding extends Bindings {
 
     // Get.put(MovieDetailsController());
     // Get.put(MyListController());
-    Get.put(SearchController());
+    // Get.put(SearchController(),permanent: true);
     Get.put(HotNewsController());
     Get.put(ProfileController());
 

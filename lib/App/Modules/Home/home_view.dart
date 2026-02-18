@@ -157,7 +157,7 @@ class HomeView extends GetView<HomeController> {
                          children: [
                            Text(
                              controller.selectedGenre.value?.name ?? "Categories",
-                             style: TextStyle(color: Colors.white),
+                             style: TextStyle(color: Colors.white,fontSize: size2),
                            ),
                            Icon(Icons.keyboard_arrow_down, color: Colors.white),
                          ],
