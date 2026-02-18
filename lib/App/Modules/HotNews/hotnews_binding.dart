@@ -6,6 +6,8 @@ import 'hotnews_controller.dart';
 class HotNewsBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put<HotNewsController>(HotNewsController());
+    Get.lazyPut<HotNewsController>(() => HotNewsController());
+
+    // Get.put<HotNewsController>(HotNewsController());
   }
 }

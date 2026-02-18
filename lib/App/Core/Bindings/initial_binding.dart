@@ -20,20 +20,31 @@ class InitialBinding extends Bindings {
   void dependencies() {
     // Get.put<HomeController>(HomeController());
     // Get.put<MyListController>(MyListController());
-    Get.put(SplashController());
-    Get.put(ThemeController());
+    // Get.put(SplashController());
+    // Get.put(ThemeController());
 
-    // Get.put(AuthController());
-    Get.put(MyListController());
-    Get.put(BottomAppbarController());
-    Get.put(HomeController());
-    Get.put<DownloadController>(DownloadController(),permanent: true);
-
-    // Get.put(MovieDetailsController());
+    // // Get.put(AuthController());
     // Get.put(MyListController());
-    Get.put(SearchController());
-    Get.put(HotNewsController());
-    Get.put(ProfileController());
+    // Get.put(BottomAppbarController());
+    // Get.put(HomeController());
+    // Get.put<DownloadController>(DownloadController(),permanent: true);
 
+    // // Get.put(MovieDetailsController());
+    // // Get.put(MyListController());
+    // Get.put(SearchController());
+    // Get.put(HotNewsController());
+    // Get.put(ProfileController());
+
+    // Use lazy loading for better performance
+    Get.lazyPut<SplashController>(() => SplashController());
+    Get.lazyPut<ThemeController>(() => ThemeController());
+    Get.lazyPut<MyListController>(() => MyListController());
+    Get.lazyPut<BottomAppbarController>(() => BottomAppbarController());
+    Get.lazyPut<HomeController>(() => HomeController());
+    Get.lazyPut<DownloadController>(() => DownloadController(), fenix: true);
+    Get.lazyPut<CustomSearchController>(() => CustomSearchController());
+    Get.lazyPut<HotNewsController>(() => HotNewsController());
+    Get.lazyPut<ProfileController>(() => ProfileController());
+    Get.lazyPut<AuthController>(() => AuthController());
   }
 }
