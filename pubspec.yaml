@@ -35,6 +35,11 @@ dependencies:
   firebase_database:
   firebase_storage:
   share_plus:
+  connectivity_plus:
+  web_socket_channel:
+  youtube_player_flutter:
+  firebase_messaging: ^14.7.1
+  flutter_local_notifications: ^14.1.0
 
 dev_dependencies:
   flutter_test:

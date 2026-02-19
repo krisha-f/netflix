@@ -56,8 +56,8 @@ class AuthController extends GetxController {
         Get.toNamed(AppRoutes.profileSelection);
       }
 
-      // storage.saveLoginStatus( true);
-      await createUserInDatabase(_auth.currentUser!);
+      // // storage.saveLoginStatus( true);
+      // await createUserInDatabase(_auth.currentUser!);
 
       storage.saveLoginStatus(true);
       storage.saveUserEmail(_auth.currentUser!.email!);
@@ -70,7 +70,11 @@ class AuthController extends GetxController {
 
 
       if (profileController.profiles.length == 1) {
-      Get.toNamed(AppRoutes.bottomAppBar);}
+      Get.toNamed(AppRoutes.bottomAppBar);
+
+      }
+      // storage.saveLoginStatus( true);
+      await createUserInDatabase(_auth.currentUser!);
 
     } on FirebaseAuthException catch (e) {
       Get.snackbar(logInFailed, e.message ?? error,
@@ -120,7 +124,6 @@ class AuthController extends GetxController {
         password: passwordController.text.trim(),
       );
 
-      await createUserInDatabase(_auth.currentUser!);
 
       storage.saveLoginStatus(true);
       storage.saveUserEmail(_auth.currentUser!.email!);
@@ -128,24 +131,26 @@ class AuthController extends GetxController {
       final ProfileController profileController =
       Get.find<ProfileController>();
 
-      // 🔥 Load profiles
+      //  Load profiles
       await profileController.loadProfileData();
 
-      // 🔥 If no profile → create default
+      //  If no profile → create default
       if (profileController.profiles.isEmpty) {
         await profileController.createProfile("Main", "");
         await profileController.loadProfileData();
       }
 
-      // 🔥 If only one profile → auto select & go bottom
+      //  If only one profile → auto select & go bottom
       if (profileController.profiles.length == 1) {
         final id = profileController.profiles.first["id"];
         await profileController.switchProfile(id);
         Get.toNamed(AppRoutes.bottomAppBar);
       } else {
-        // 🔥 Multiple profiles → show selection
+        //  Multiple profiles → show selection
         Get.toNamed(AppRoutes.profileSelection);
       }
+
+      await createUserInDatabase(_auth.currentUser!);
 
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
@@ -160,6 +165,38 @@ class AuthController extends GetxController {
   }
 
   //sign in with google (not connected getstorage)
+  // Future<void> signInWithGoogle() async {
+  //   try {
+  //     isLoading.value = true;
+  //
+  //     final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+  //
+  //     await googleSignIn.initialize();
+  //
+  //     final GoogleSignInAccount googleUser =
+  //     await googleSignIn.authenticate();
+  //
+  //     final GoogleSignInAuthentication googleAuth =
+  //         await googleUser.authentication;
+  //
+  //     final credential = GoogleAuthProvider.credential(
+  //       idToken: googleAuth.idToken,
+  //     );
+  //
+  //     await FirebaseAuth.instance.signInWithCredential(credential);
+  //
+  //     // Get.offAllNamed(AppRoutes.profileSelection);
+  //     Get.toNamed(AppRoutes.bottomAppBar);
+  //
+  //   } on FirebaseAuthException catch (e) {
+  //     Get.snackbar(googleSignInFailed, e.message ?? error);
+  //   } catch (e) {
+  //     Get.snackbar(error, e.toString());
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
   Future<void> signInWithGoogle() async {
     try {
       isLoading.value = true;
@@ -172,7 +209,7 @@ class AuthController extends GetxController {
       await googleSignIn.authenticate();
 
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
@@ -180,13 +217,51 @@ class AuthController extends GetxController {
 
       await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // Get.offAllNamed(AppRoutes.profileSelection);
-      Get.toNamed(AppRoutes.bottomAppBar);
+      final User user = _auth.currentUser!;
+
+      //  Create user in Realtime Database if not exists
+      await createUserInDatabase(user);
+
+      //  Save login status in GetStorage
+      storage.saveLoginStatus(true);
+      storage.saveUserEmail(user.email ?? "");
+
+      // Reload theme
+      await Get.find<ThemeController>().reloadThemeAfterLogin();
+
+      //  Handle Profiles (same as login)
+      final ProfileController profileController =
+      Get.find<ProfileController>();
+
+      await profileController.loadProfileData();
+
+      if (profileController.profiles.isEmpty) {
+        await profileController.createProfile("Main", "");
+        await profileController.loadProfileData();
+      }
+
+      if (profileController.profiles.length == 1) {
+        final id = profileController.profiles.first["id"];
+        await profileController.switchProfile(id);
+        Get.toNamed(AppRoutes.bottomAppBar);
+      } else {
+        Get.toNamed(AppRoutes.profileSelection);
+      }
 
     } on FirebaseAuthException catch (e) {
-      Get.snackbar(googleSignInFailed, e.message ?? error);
+      Get.snackbar(
+        googleSignInFailed,
+        e.message ?? error,
+        backgroundColor: whiteColor,
+        colorText: blackColor,
+      );
     } catch (e) {
-      Get.snackbar(error, e.toString());
+      Get.snackbar(
+        error,
+        e.toString(),
+        backgroundColor: whiteColor,
+        colorText: blackColor,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -202,7 +277,7 @@ class AuthController extends GetxController {
     // storage.clearAll();
     // Get.toNamed(AppRoutes.login);
     // SystemNavigator.pop();
-    Future.delayed(const Duration(milliseconds: 20), () {
+    Future.delayed(const Duration(milliseconds: 1), () {
       SystemNavigator.pop();
     });
 
@@ -239,7 +314,7 @@ class AuthController extends GetxController {
 
       await userRef.set({
         "email": user.email,
-        "theme": false,
+        "theme": storage.isDarkMode,
         "profiles": {
           profileId: {
             "id": profileId,

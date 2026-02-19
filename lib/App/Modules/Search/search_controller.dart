@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import '../../Data/Models/movie_trailer_model.dart';
 import '../../Data/Models/search_movie_model.dart';
 import '../../Data/Models/trending_movie_model.dart';
 import '../../Data/Services/apiservice.dart';
@@ -24,6 +25,10 @@ class CustomSearchController extends GetxController {
         search(value);
       }
     }, time: const Duration(milliseconds: 600));
+  }
+
+  Future<MovieTrailer?> fetchTrailer(int id) async {
+    return await apiService.fetchTrailerKey(id);
   }
 
   Future<void> search(String text) async {

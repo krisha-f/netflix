@@ -13,6 +13,7 @@ class SignUpView extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -28,7 +29,6 @@ class SignUpView extends GetView<AuthController> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
 
                 SizedBox(height: size5),
 
@@ -105,16 +105,17 @@ class SignUpView extends GetView<AuthController> {
                 SizedBox(height: size3,),
                 ElevatedButton(
                   onPressed: () {
-                    controller.signInWithGoogle;
+                    controller.signInWithGoogle();
 
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: AppThemeHelper.textColor(context),shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(20)),elevation: 2.0,),
                   child: Center(child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      FaIcon(FontAwesomeIcons.google),
+                      Icon(Icons.g_mobiledata,color: blackColor,size: 40,),
+                      // FaIcon(FontAwesomeIcons.google,color: blackColor,),
                       SizedBox(width: size1,),
-                      Text(logInWithGoogle),
+                      Text(logInWithGoogle,style: TextStyle(color: blackColor),),
                     ],
                   )),
                 ),

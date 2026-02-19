@@ -198,12 +198,12 @@ class ProfileController extends GetxController {
 
     if (snapshot.exists) {
       final data = Map<String, dynamic>.from(snapshot.value as Map);
-
       data.forEach((key, value) {
         final map = Map<String, dynamic>.from(value);
         map["id"] = key;
         profiles.add(map);
       });
+
     }
     storage.saveSelectedProfile(profiles.last["id"]);
     final savedId = storage.getSelectedProfile();
@@ -350,7 +350,33 @@ class ProfileController extends GetxController {
     await loadProfileData();
   }
 
+  Future<void> updateProfile() async {
+    if (selectedProfileId.value.isEmpty) return;
 
+    final id = selectedProfileId.value;
+    final name = nameController.text.trim();
+
+    if (name.isEmpty) {
+      Get.snackbar("Error", "Profile name cannot be empty");
+      return;
+    }
+
+    try {
+      await database
+          .child("users/$uid/profiles/$id")
+          .update({
+        "name": name,
+        "image": imageBase64.value,
+      });
+
+      await loadProfileData();
+      Get.back();
+
+      Get.snackbar("Success", "Profile updated successfully");
+    } catch (e) {
+      Get.snackbar("Error", "Failed to update profile");
+    }
+  }
 
   // /// PICK IMAGE
   // Future<void> pickImage() async {
@@ -364,22 +390,22 @@ class ProfileController extends GetxController {
   // }
 
   /// UPDATE PROFILE
-  Future<void> updateProfile() async {
-  if (uid == null) return;
-
-  await database
-      .child("users/$uid/profiles/$profileId")
-      .update({
-  "name": nameController.text.trim(),
-  "imageBase64": imageBase64.value,
-  });
-
-  /// Reload main controller
-  await Get.find<ProfileController>()
-      .loadProfileData();
-
-  Get.back();
-  }
+  // Future<void> updateProfile() async {
+  // if (uid == null) return;
+  //
+  // await database
+  //     .child("users/$uid/profiles/$profileId")
+  //     .update({
+  // "name": nameController.text.trim(),
+  // "imageBase64": imageBase64.value,
+  // });
+  //
+  // /// Reload main controller
+  // await Get.find<ProfileController>()
+  //     .loadProfileData();
+  //
+  // Get.back();
+  // }
 
 
 

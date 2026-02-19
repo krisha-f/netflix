@@ -1,7 +1,13 @@
 
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_navigation/src/snackbar/snackbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:netflix/App/Data/Services/utils.dart';
 
@@ -10,6 +16,7 @@ import '../Models/movie_category_model.dart';
 import '../Models/movie_details_model.dart';
 import '../Models/movie_model.dart';
 import '../Models/movie_recommendation_model.dart';
+import '../Models/movie_trailer_model.dart';
 import '../Models/search_movie_model.dart';
 import '../Models/top_rated_movie_model.dart';
 import '../Models/trending_movie_model.dart';
@@ -19,24 +26,112 @@ var key = "?api_key=$apiKey";
 class ApiService {
 
   //now playing movie
-  Future<Movies?> fetchMovies() async{
-    try{
-      const endPoint= "movie/now_playing";
+  Future<Movies> fetchMovies() async {
+    try {
+      const endPoint = "movie/now_playing";
       final apiUrl = "$baseUrl$endPoint$key";
-      final response = await http.get(Uri.parse(apiUrl));
-      if(response.statusCode == 200){
-        return Movies.fromJson(jsonDecode(response.body));      }
-      else{
-        Exception("Failed to Load Movies");
+
+      final response = await http
+          .get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        //TODO : Expired Login
+
+          openAndCloseLoadingDialog(false);
+          // onError();
       }
+
+      if (response.statusCode == 502) {
+
+          openAndCloseLoadingDialog(false);
+          showSnackBar("wrong");
+
+      }
+
+      if (response.statusCode == 400 || jsonDecode(response.body)["error_code"] != null) {
+
+          if (jsonDecode(response.body)["error_code"] == "invalid token") {
+          openAndCloseLoadingDialog(false);
+          try {
+            showSnackBar(jsonDecode(response.body)["message"] ?? "wrong");
+          } catch (e) {
+            showSnackBar("wrong");
+          }
+        }
+      }
+
+      // if (response.statusCode == 200) {
+      //   return Movies.fromJson(jsonDecode(response.body));
+      //
+      //   // print("ApiService GET Response : ${json.decode(response.body)}");
+      // }
+      // return jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return Movies.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception(
+            "Server Error: ${response.statusCode}");
+      }
+    } on SocketException {
+      throw Exception("No Internet Connection");
+    } on TimeoutException {
+      throw Exception("Request Timeout");
+    } catch (e) {
+      throw Exception("Fetching error to find movies: $e");
     }
-    catch(e){
-      Exception("Fetching error to find movies: $e");
-      return null;
-    }
-    return null;
+  }
+  void showSnackBar(String message) {
+    Get.snackbar(
+      '',
+      '',
+      snackPosition: SnackPosition.BOTTOM,
+      snackStyle: SnackStyle.FLOATING,
+      messageText: Text(
+        message,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 15,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      titleText: Container(),
+      borderRadius: 20,
+      backgroundColor: Colors.black,
+      colorText: Theme.of(Get.overlayContext!).colorScheme.surface,
+      isDismissible: false,
+      animationDuration: const Duration(milliseconds: 500),
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.all(15),
+      /*mainButton: TextButton(
+      child: Text('Undo'),
+      onPressed: () {},
+    ),*/
+    );
   }
 
+  Future<void> openAndCloseLoadingDialog(bool isShowHide) async {
+    if (Get.overlayContext != null) {
+      if (isShowHide) {
+        showDialog(
+          context: Get.overlayContext!,
+          barrierDismissible: false,
+          builder: (_) => WillPopScope(
+            onWillPop: () async => false,
+            child: const Center(
+              child: SizedBox(
+                width: 30,
+                height: 30,
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          ),
+        );
+      } else {
+        Navigator.pop(Get.overlayContext!);
+      }
+    }
+  }
   //upcoming movie
   Future<UpcomingMovies?> upCommingMovies() async{
     try{
@@ -46,8 +141,14 @@ class ApiService {
       if(response.statusCode == 200){
         return UpcomingMovies.fromJson(jsonDecode(response.body));      }
       else{
-        Exception("Failed to Load Movies");
+        throw Exception(
+            "Server Error: ${response.statusCode}");
+        // Exception("Failed to Load Movies");
       }
+    }on SocketException {
+      throw Exception("No Internet Connection");
+    } on TimeoutException {
+      throw Exception("Request Timeout");
     }
     catch(e){
       Exception("Fetching error to find movies: $e");
@@ -195,12 +296,16 @@ class ApiService {
     try{
       final endPoint= "genre/movie/list";
       final apiUrl = "$baseUrl$endPoint$key";
-      final response = await http.get(Uri.parse(apiUrl));
+      final response = await http.get(Uri.parse(apiUrl)).timeout(const Duration(seconds: 10));;
       if(response.statusCode == 200){
         return CategoryMovies.fromJson(jsonDecode(response.body));      }
       else{
         throw Exception("Failed to Load Category Movies");
       }
+    } on SocketException {
+      throw Exception("No Internet Connection");
+    } on TimeoutException {
+      throw Exception("Request Timeout");
     }
     catch(e){
       throw Exception("Fetching error to find Category Movies: $e");
@@ -251,7 +356,55 @@ class ApiService {
     }
   }
 
-}
+  Future<MovieTrailer?> fetchTrailerKey(int movieId) async {
+    final url =
+        "https://api.themoviedb.org/3/movie/$movieId/videos?api_key=$apiKey";
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      final movieTrailer = MovieTrailer.fromJson(data);
+
+      return movieTrailer;
+    }
+
+    return null;
+  }
+
+  // Future<MovieTrailer?> fetchTrailerKey(int movieId) async {
+  //   final url =
+  //       "https://api.themoviedb.org/3/movie/$movieId/videos?api_key=$apiKey";
+  //
+  //   final response = await http.get(Uri.parse(url));
+  //
+  //   if (response.statusCode == 200) {
+  //     final data = jsonDecode(response.body);
+  //     final results = data["results"] as List;
+  //
+  //     final trailer = results.firstWhere(
+  //           (video) =>
+  //       video["type"] == "Trailer" &&
+  //           video["site"] == "YouTube",
+  //       orElse: () => null,
+  //     );
+  //
+  //     if (trailer != null) {
+  //       return MovieTrailer.fromJson(trailer);
+  //     }
+  //   }
+  //
+  //   return null;
+  // }
+
+
+
+  }
+
+
+
+
 
 //movieid
 //query = harry

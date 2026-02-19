@@ -41,9 +41,10 @@ class HotNewsView extends GetView<HotNewsController> {
       // backgroundColor: blackColor,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-            title: Center(child: Text("Hot News")),
+            title: Center(child: Text("Hot News",style: TextStyle(color: AppThemeHelper.textColor(context)),)),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         foregroundColor: whiteColor,
+        automaticallyImplyLeading: false,
       ),
       body: FutureBuilder(
         future: controller.hotNewsData,
@@ -126,13 +127,13 @@ class HotNewsView extends GetView<HotNewsController> {
                               SizedBox(height: size1),
                               Row(
                                 children: [
-                                  Text(comingOn),
+                                  Text(comingOn,style: TextStyle(color: AppThemeHelper.textColor(context)),),
                                   SizedBox(width: size1,),
 
                                   Text(
                                     hotNewsData.releaseDate == null
                                         ? firstAirDate
-                                        : releaseDate,
+                                        : releaseDate,style: TextStyle(color: AppThemeHelper.textColor(context))
                                   ),
                                   SizedBox(width: size1),
                                   Text(
@@ -150,17 +151,17 @@ class HotNewsView extends GetView<HotNewsController> {
                                                       ?.toString() ??
                                                   "",
                                             ),
-                                          ),
+                                          ),style: TextStyle(color: AppThemeHelper.textColor(context))
                                   ),
                                   Spacer(),
-                                  Icon(Icons.notifications, color: whiteColor),
+                                  Icon(Icons.notifications, color:  AppThemeHelper.textColor(context)),
                                   SizedBox(width: size2,),
                                   GestureDetector(
                                       onTap: (){
                                         Get.toNamed(AppRoutes.movieDetails,arguments: hotNewsData.id);
 
                                       },
-                                      child: Icon(Icons.info_outline, color: whiteColor)),
+                                      child: Icon(Icons.info_outline, color:  AppThemeHelper.textColor(context))),
                                 ],
                               ),
                               SizedBox(height: size2,),
@@ -169,7 +170,7 @@ class HotNewsView extends GetView<HotNewsController> {
                                 hotNewsData.overview ?? "",
                                 maxLines: 4,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(color: whiteColor),
+                                style: TextStyle(color: AppThemeHelper.textColor(context)),
                               ),
                               SizedBox(height: size1,),
 

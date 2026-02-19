@@ -70,10 +70,12 @@ class HotNewsController extends GetxController {
   final isLoading = false.obs;
   final errorMessage = Rxn<String>();
   final hasError = false.obs;
+  late Future<HotNews?> hotNewsData;
 
   @override
   void onInit() {
     super.onInit();
+    hotNewsData= _apiService.hotNews();
     loadHotNews();
   }
 

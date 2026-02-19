@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -10,11 +11,20 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get_storage/get_storage.dart';
 import 'App/Core/Bindings/initial_binding.dart';
+import 'App/Data/Services/firebase_message.dart';
 import 'App/Data/Services/storage_service.dart';
 import 'App/Modules/Theme/theme.controller.dart';
 import 'App/Routes/app_pages.dart';
 
 Future<void> main() async {
+
+  Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+    await Firebase.initializeApp();
+    print("Handling background message: ${message.messageId}");
+  }
+
+// Register the handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runZonedGuarded(() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
@@ -35,6 +45,8 @@ Future<void> main() async {
   }
   else{
   await Firebase.initializeApp();}
+
+  await Get.putAsync(() => NotificationService().init());
 
   await Get.putAsync(() async => StorageService());
   Get.put(ThemeController());

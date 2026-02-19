@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +8,12 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_ticket_provider_mixin.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:http/http.dart' as http;
 import '../../Data/Models/movie_details_model.dart';
 import '../../Data/Models/movie_recommendation_model.dart';
+import '../../Data/Models/movie_trailer_model.dart';
 import '../../Data/Services/apiservice.dart';
+import '../../Data/Services/utils.dart';
 
 class MovieDetailsController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -18,6 +23,9 @@ class MovieDetailsController extends GetxController
   late Future<MovieDetails?> movieDetailsData;
   late Future<MovieRecommendations?> movieRecommendationsData;
 
+  // late Future<MovieTrailer?> movieTrailerData;
+  // MovieTrailer? movieTrailerData;
+
   late TabController tabController;
 
   final ApiService apiService = ApiService();
@@ -26,6 +34,7 @@ class MovieDetailsController extends GetxController
   RxList<Map<String, dynamic>> reviews = <Map<String, dynamic>>[].obs;
 
   String? get uid => FirebaseAuth.instance.currentUser?.uid;
+
 
   @override
   void onInit() {
@@ -39,11 +48,18 @@ class MovieDetailsController extends GetxController
     movieDetailsData = apiService.movieDetails(movieId);
     movieRecommendationsData = apiService.movieRecommendations(movieId);
 
+
     loadReviews();
+  }
+
+  Future<MovieTrailer?> fetchTrailer(int id) async {
+    return await apiService.fetchTrailerKey(id);
   }
 
   Future<void> addReview(String text, double rating) async {
     if (uid == null) return;
+    final userEmail = FirebaseAuth.instance.currentUser?.email ?? "Unknown";
+
 
     final ref = database
         .child("movieReviews/$movieId")
@@ -54,7 +70,11 @@ class MovieDetailsController extends GetxController
       "review": text,
       "rating": rating,
       "time": DateTime.now().toString(),
+      "email":userEmail,
     });
+
+
+
 
     loadReviews();
   }
@@ -73,6 +93,8 @@ class MovieDetailsController extends GetxController
           .toList(),
     );
   }
+
+
 }
 
 

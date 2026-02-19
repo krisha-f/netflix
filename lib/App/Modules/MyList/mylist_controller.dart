@@ -9,7 +9,7 @@ class MyListController extends GetxController {
   final storage = Get.find<StorageService>();
   final database = FirebaseDatabase.instance.ref();
 
-  RxList<Results> myMovies = <Results>[].obs;
+  RxList<MovieResults> myMovies = <MovieResults>[].obs;
   String? get uid => FirebaseAuth.instance.currentUser?.uid;
   String? get profileId => storage.selectedProfileId;
 
@@ -56,7 +56,7 @@ class MyListController extends GetxController {
         value.values
             .whereType<Map>()
             .map((e) =>
-            Results.fromJson(Map<String, dynamic>.from(e)))
+            MovieResults.fromJson(Map<String, dynamic>.from(e)))
             .toList(),
       );
     } else {
@@ -79,7 +79,7 @@ class MyListController extends GetxController {
   // }
 
 
-  void addMovie(Results movie) {
+  void addMovie(MovieResults movie) {
     if (uid == null || profileId == null) return;
 
     final ref = database.child(
@@ -93,7 +93,7 @@ class MyListController extends GetxController {
       ref.set(movie.toJson());
     }
   }
-  bool isAdded(Results movie) {
+  bool isAdded(MovieResults movie) {
     return myMovies.any((m) => m.id == movie.id);
   }
 

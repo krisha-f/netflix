@@ -1,3 +1,5 @@
+
+
 import 'movie_model.dart';
 
 class CategoryMovies {
@@ -43,15 +45,15 @@ class Genres {
 }
 
 class GenreMovieResponse {
-  List<Results>? results;
+  List<MovieResults>? results;
 
   GenreMovieResponse({this.results});
 
   GenreMovieResponse.fromJson(Map<String, dynamic> json) {
     if (json['results'] != null) {
-      results = <Results>[];
+      results = <MovieResults>[];
       json['results'].forEach((v) {
-        results!.add(Results.fromJson(v));
+        results!.add(MovieResults.fromJson(v));
       });
     }
   }

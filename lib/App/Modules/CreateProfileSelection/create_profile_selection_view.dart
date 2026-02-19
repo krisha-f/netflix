@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:netflix/Constant/app_colors.dart';
 
 import 'create_profile_selection_controller.dart';
 
@@ -23,10 +24,10 @@ class ProfileSelectionView
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+             Text(
               "Who's Watching?",
               style: TextStyle(
-                color: Colors.white,
+                color: AppThemeHelper.textColor(context),
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),

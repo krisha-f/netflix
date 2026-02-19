@@ -12,9 +12,11 @@ import 'package:netflix/Constant/app_colors.dart';
 import '../../../Constant/app_size.dart';
 import '../../../Constant/app_strings.dart';
 import '../../Data/Models/movie_category_model.dart';
+import '../../Data/Models/movie_entity.dart';
 import '../../Data/Models/movie_model.dart';
 import '../../Data/Services/utils.dart';
 import '../Download/download_controller.dart';
+import '../trailer_player_screen.dart';
 import 'home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -28,6 +30,9 @@ class HomeView extends GetView<HomeController> {
      return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
        appBar: AppBar(
+         surfaceTintColor: Colors.transparent,
+         elevation: 0,
+         scrolledUnderElevation: 0,
          automaticallyImplyLeading: false,
          centerTitle: true,
          toolbarHeight: 100,
@@ -172,7 +177,9 @@ class HomeView extends GetView<HomeController> {
        ),
       body: SingleChildScrollView(
         controller: controller.scrollController,
-        child: Column(
+        child:
+
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: size3),
@@ -247,34 +254,35 @@ class HomeView extends GetView<HomeController> {
                     bottom: -40,
                     child: Padding(
                       padding: EdgeInsetsGeometry.symmetric(
-                        horizontal: 30,
-                        vertical: 20,
+                        horizontal: MediaQuery.of(context).size.width*0.08,
+                        vertical:  MediaQuery.of(context).size.height*0.02,
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Container(
-                            height: cHeight,
-                            width: cWidth,
-                            decoration: BoxDecoration(
-                              color:AppThemeHelper.textColor(context)    ,
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(Icons.play_arrow, color:  AppThemeHelper.reverseTextColor(context)),
-                                Text(
-                                    playText,
-                                  style: TextStyle(
-                                    color: AppThemeHelper.reverseTextColor(context),
-                                    fontWeight: FontWeight.bold,
+                           Container(
+                              height: cHeight,
+                              width: cWidth,
+                              decoration: BoxDecoration(
+                                color:AppThemeHelper.textColor(context)    ,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.play_arrow, color:  AppThemeHelper.reverseTextColor(context)),
+                                  Text(
+                                      playText,
+                                    style: TextStyle(
+                                      color: AppThemeHelper.reverseTextColor(context),
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
+
                           SizedBox(width: size2),
                           // Container(
                           //   height: 50,
@@ -301,16 +309,16 @@ class HomeView extends GetView<HomeController> {
                           Obx(() {
                             final currentMovie = controller.currentMovie.value;
 
-                            final isAdded =
-                                currentMovie != null &&
-                                    controller.myListController.isAdded(currentMovie);
+                            // final isAdded =
+                            //     currentMovie != null &&
+                            //         controller.myListController.isAdded(currentMovie);
 
                             return GestureDetector(
                               onTap: () {
-                                if (currentMovie != null) {
-                                  controller.myListController.addMovie(currentMovie);
+                                // if (currentMovie != null) {
+                                //   controller.myListController.addMovie(currentMovie);
                                   Get.toNamed(AppRoutes.myList);
-                                }
+                                // }
                               },
                               child: Container(
                                 height: cHeight,
@@ -323,12 +331,12 @@ class HomeView extends GetView<HomeController> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
-                                      isAdded ? Icons.check : Icons.list_alt,
+                                     Icons.list_alt,
                                       color: whiteColor,
                                     ),
                                     SizedBox(width: size8),
                                     Text(
-                                      isAdded ? added : myList,
+                                      myList,
                                       style: TextStyle(
                                         color: whiteColor,
                                         fontWeight: FontWeight.bold,
@@ -374,7 +382,8 @@ class HomeView extends GetView<HomeController> {
             }
 
             return Container();
-          }),            //   future: controller.treadingMoviesData,
+          }),
+            //   future: controller.treadingMoviesData,
             //   movieType: trendingMovies,
             //   isReverse: true,
             //   context: context,
@@ -386,33 +395,41 @@ class HomeView extends GetView<HomeController> {
             //   context: context,
             // ),
 
-            moviesTypes(
-                future: controller.upcomingMoviesData,
-                movieType: upComingMovies,
-                isReverse: true,
-                context: context, selectedIndex: controller.selectedUpcomingPosterIndex
-            ),
-
-            moviesTypes(
-                future: controller.treadingMoviesData,
-                movieType: trendingMovies,
-                isReverse: true,
-                context: context, selectedIndex: controller.selectedTrendingPosterIndex
-            ),
 
 
-            moviesTypes(
-              future: controller.topRatedMoviesData,
-              movieType: topRatedMovies,
-              isReverse: true,
-                context: context, selectedIndex: controller.selectedTopRatedPosterIndex
-            ),
-            moviesTypes(
-              future: controller.tvPopularMoviesData,
-              movieType: tvPopularMovies,
-              isReverse: true,
-                context: context, selectedIndex: controller.selectedTvPopularPosterIndex
-            ),
+
+
+                      moviesTypes(
+                          future: controller.upcomingMoviesData ?? Future.value(null),
+                          movieType: upComingMovies,
+                          isReverse: true,
+                          context: context, selectedIndex: controller.selectedUpcomingPosterIndex
+                      ),
+
+                      moviesTypes(
+                          future: controller.treadingMoviesData?? Future.value(null),
+                          movieType: trendingMovies,
+                          isReverse: true,
+                          context: context, selectedIndex: controller.selectedTrendingPosterIndex
+                      ),
+
+
+                      moviesTypes(
+                          future: controller.topRatedMoviesData?? Future.value(null),
+                          movieType: topRatedMovies,
+                          isReverse: true,
+                          context: context, selectedIndex: controller.selectedTopRatedPosterIndex
+                      ),
+                      moviesTypes(
+                          future: controller.tvPopularMoviesData?? Future.value(null),
+                          movieType: tvPopularMovies,
+                          isReverse: true,
+                          context: context, selectedIndex: controller.selectedTvPopularPosterIndex
+                      ),
+
+
+
+
           ],
         ),
       ),
@@ -467,7 +484,7 @@ class HomeView extends GetView<HomeController> {
    // }
 
    Widget moviesListFromRx({
-     required List<Results> movies,
+     required List<MovieResults> movies,
      required String movieType,
      bool isReverse = false,
      required BuildContext context,
@@ -678,10 +695,10 @@ class HomeView extends GetView<HomeController> {
      required String movieType,
      required RxInt selectedIndex,
      bool isReverse = false,
-     context,
+     required BuildContext context,
    }) {
      return Padding(
-       padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
+       padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
        child: Column(
          crossAxisAlignment: CrossAxisAlignment.start,
          children: [
@@ -705,131 +722,203 @@ class HomeView extends GetView<HomeController> {
                    return Center(child: Text("Error: ${snapshot.error}"));
                  } else if (snapshot.hasData) {
                    final movies = snapshot.data!.results;
-                   return ListView.builder(
-                     reverse: isReverse,
-                     scrollDirection: Axis.horizontal,
-                     itemCount: movies.length,
-                     itemBuilder: (context, index) {
-                       final moviesDatas = movies[index];
+                   return     SizedBox(
+                       height: cHeight1,
+                     child: ListView.builder(
+                       reverse: isReverse,
+                       scrollDirection: Axis.horizontal,
+                       itemCount: movies.length,
+                       itemBuilder: (context, index) {
+                         final moviesDatas = movies[index];
 
-                       return GestureDetector(
-                         onTap: () {
-                           if (selectedIndex.value == index) {
-                             selectedIndex.value = -1;
-                           } else {
-                             selectedIndex.value = index;
-                           }
-                         },
-                         child: Obx(() {
-                           final isSelected =
-                               selectedIndex.value == index;
+                         return GestureDetector(
+                           onTap: () {
+                             if (selectedIndex.value == index) {
+                               selectedIndex.value = -1;
+                             } else {
+                               selectedIndex.value = index;
+                             }
+                           },
+                           child: Obx(() {
+                             final isSelected =
+                                 selectedIndex.value == index;
 
-                           return Padding(
-                             padding: const EdgeInsets.all(8.0),
-                             child: SizedBox(
-                               height: cHeight2,
-                               width: cWidth1,
-                               child: Stack(
-                                 fit: StackFit.expand,
-                                 children: [
-                                   ClipRRect(
-                                     borderRadius:
-                                     BorderRadius.circular(6),
-                                     child: CachedNetworkImage(
-                                       imageUrl:
-                                       "$imageUrl${moviesDatas.posterPath}",
-                                       fit: BoxFit.cover,
+                             return Padding(
+                               padding: const EdgeInsets.all(8.0),
+                               child: SizedBox(
+                                 height: cHeight2,
+                                 width: cWidth1,
+                                 child: Stack(
+                                   fit: StackFit.expand,
+                                   children: [
+                                     ClipRRect(
+                                       borderRadius:
+                                       BorderRadius.circular(6),
+                                       child: CachedNetworkImage(
+                                         imageUrl:
+                                         "$imageUrl${moviesDatas.posterPath}",
+                                         fit: BoxFit.cover,
+                                       ),
                                      ),
-                                   ),
+                                     if (isSelected)
+                                       Positioned(
+                                         bottom: 0,
+                                         left: 0,
+                                         right: 0,
+                                         child: Container(
+                                           padding: const EdgeInsets.symmetric(vertical: 8),
+                                           decoration: BoxDecoration(
+                                             color: Colors.black.withOpacity(0.6),
+                                             borderRadius: const BorderRadius.only(
+                                               bottomLeft: Radius.circular(6),
+                                               bottomRight: Radius.circular(6),
+                                             ),
+                                           ),
+                                           child: Center(
+                                             child: Wrap(
+                                               spacing: 10,
+                                               alignment: WrapAlignment.center,
+                                               children: [
+                                                 Obx(() {
+                                                   final downloadController =
+                                                   Get.find<DownloadController>();
 
-                                   // if (isSelected)
-                                   //   Positioned(
-                                   //     bottom: 0,
-                                   //     left: 0,
-                                   //     right: 0,
-                                   //     child: Container(
-                                   //       padding: const EdgeInsets.symmetric(
-                                   //           vertical: 8),
-                                   //       decoration: BoxDecoration(
-                                   //         color: Colors.black
-                                   //             .withOpacity(0.6),
-                                   //         borderRadius:
-                                   //         const BorderRadius.only(
-                                   //           bottomLeft:
-                                   //           Radius.circular(6),
-                                   //           bottomRight:
-                                   //           Radius.circular(6),
-                                   //         ),
-                                   //       ),
-                                   //       child: Center(
-                                   //         child: Wrap(
-                                   //           spacing: 10,
-                                   //           alignment:
-                                   //           WrapAlignment.center,
-                                   //           children: [
-                                   //             Obx(() {
-                                   //               final downloadController =
-                                   //               Get.find<
-                                   //                   DownloadController>();
-                                   //
-                                   //               final isDownloading =
-                                   //                   downloadController
-                                   //                       .downloadingMovieId
-                                   //                       .value ==
-                                   //                       moviesDatas.id;
-                                   //
-                                   //               final isDownloaded =
-                                   //               downloadController
-                                   //                   .isDownloaded(
-                                   //                   moviesDatas);
-                                   //
-                                   //               return GestureDetector(
-                                   //                 onTap: () {
-                                   //                   downloadController
-                                   //                       .downloadMovie(
-                                   //                       moviesDatas);
-                                   //                 },
-                                   //                 child: isDownloading
-                                   //                     ? const SizedBox(
-                                   //                   height: 18,
-                                   //                   width: 18,
-                                   //                   child:
-                                   //                   CircularProgressIndicator(
-                                   //                     strokeWidth: 2,
-                                   //                     color: Colors.white,
-                                   //                   ),
-                                   //                 )
-                                   //                     : Icon(
-                                   //                   isDownloaded
-                                   //                       ? Icons
-                                   //                       .check_circle
-                                   //                       : Icons
-                                   //                       .download_sharp,
-                                   //                   color: isDownloaded
-                                   //                       ? Colors.green
-                                   //                       : Colors.white,
-                                   //                   size: 18,
-                                   //                 ),
-                                   //               );
-                                   //             }),
-                                   //             const Icon(Icons.favorite,
-                                   //                 color: Colors.red,
-                                   //                 size: 18),
-                                   //             const Icon(Icons.add,
-                                   //                 color: Colors.white,
-                                   //                 size: 18),
-                                   //           ],
-                                   //         ),
-                                   //       ),
-                                   //     ),
-                                   //   ),
-                                 ],
+                                                   final isDownloading =
+                                                       downloadController.downloadingMovieId.value ==
+                                                           moviesDatas.id;
+
+                                                   final isDownloaded =
+                                                   downloadController.isMovieDownloadedById(moviesDatas.id);
+
+                                                   return GestureDetector(
+                                                     onTap: () {
+                                                       downloadController.downloadMovieById(
+                                                         movieId: moviesDatas.id,
+                                                         movieTitle: moviesDatas.title,
+                                                         movieJson: moviesDatas.toJson(),
+                                                       );
+                                                       // downloadController.downloadMovie(moviesDatas.id);
+                                                     },
+                                                     child: isDownloading
+                                                         ? const SizedBox(
+                                                       height: 18,
+                                                       width: 18,
+                                                       child: CircularProgressIndicator(
+                                                         strokeWidth: 2,
+                                                         color: Colors.white,
+                                                       ),
+                                                     )
+                                                         : Icon(
+                                                       isDownloaded
+                                                           ? Icons.check_circle
+                                                           : Icons.download_sharp,
+                                                       color: isDownloaded
+                                                           ? Colors.green
+                                                           : Colors.white,
+                                                       size: 18,
+                                                     ),
+                                                   );
+                                                 }),
+
+                                                 const Icon(Icons.favorite,
+                                                     color: Colors.red, size: 18),
+
+                                                 const Icon(Icons.add,
+                                                     color: Colors.white, size: 18),
+                                               ],
+                                             ),
+                                           ),
+                                         ),
+                                       ),
+                                     // if (isSelected)
+                                     //   Positioned(
+                                     //     bottom: 0,
+                                     //     left: 0,
+                                     //     right: 0,
+                                     //     child: Container(
+                                     //       padding: const EdgeInsets.symmetric(
+                                     //           vertical: 8),
+                                     //       decoration: BoxDecoration(
+                                     //         color: Colors.black
+                                     //             .withOpacity(0.6),
+                                     //         borderRadius:
+                                     //         const BorderRadius.only(
+                                     //           bottomLeft:
+                                     //           Radius.circular(6),
+                                     //           bottomRight:
+                                     //           Radius.circular(6),
+                                     //         ),
+                                     //       ),
+                                     //       child: Center(
+                                     //         child: Wrap(
+                                     //           spacing: 10,
+                                     //           alignment:
+                                     //           WrapAlignment.center,
+                                     //           children: [
+                                     //             Obx(() {
+                                     //               final downloadController =
+                                     //               Get.find<
+                                     //                   DownloadController>();
+                                     //
+                                     //               final isDownloading =
+                                     //                   downloadController
+                                     //                       .downloadingMovieId
+                                     //                       .value ==
+                                     //                       moviesDatas.id;
+                                     //
+                                     //               final isDownloaded =
+                                     //               downloadController
+                                     //                   .isDownloaded(
+                                     //                   moviesDatas);
+                                     //
+                                     //               return GestureDetector(
+                                     //                 onTap: () {
+                                     //                   downloadController
+                                     //                       .downloadMovie(
+                                     //                       moviesDatas);
+                                     //                 },
+                                     //                 child: isDownloading
+                                     //                     ? const SizedBox(
+                                     //                   height: 18,
+                                     //                   width: 18,
+                                     //                   child:
+                                     //                   CircularProgressIndicator(
+                                     //                     strokeWidth: 2,
+                                     //                     color: Colors.white,
+                                     //                   ),
+                                     //                 )
+                                     //                     : Icon(
+                                     //                   isDownloaded
+                                     //                       ? Icons
+                                     //                       .check_circle
+                                     //                       : Icons
+                                     //                       .download_sharp,
+                                     //                   color: isDownloaded
+                                     //                       ? Colors.green
+                                     //                       : Colors.white,
+                                     //                   size: 18,
+                                     //                 ),
+                                     //               );
+                                     //             }),
+                                     //             const Icon(Icons.favorite,
+                                     //                 color: Colors.red,
+                                     //                 size: 18),
+                                     //             const Icon(Icons.add,
+                                     //                 color: Colors.white,
+                                     //                 size: 18),
+                                     //           ],
+                                     //         ),
+                                     //       ),
+                                     //     ),
+                                     //   ),
+                                   ],
+                                 ),
                                ),
-                             ),
-                           );
-                         }),
-                       );
-                     },
+                             );
+                           }),
+                         );
+                       },
+                     ),
                    );
                  } else {
                    return Center(child: Text(problemToFetchData));

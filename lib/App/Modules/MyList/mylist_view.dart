@@ -22,7 +22,7 @@ class MyListView extends GetView<MyListController> {
           return Center(
             child: Text(
               noMoviesAdded,
-              style: TextStyle(color: whiteColor),
+              style: TextStyle(color: AppThemeHelper.textColor(context)),
             ),
           );
         }

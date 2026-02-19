@@ -2,14 +2,12 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-
 import '../../Data/Services/storage_service.dart';
 
 class ThemeController extends GetxController {
   final storage = Get.find<StorageService>();
   final database = FirebaseDatabase.instance.ref();
-
-  RxBool isDark = false.obs;
+  RxBool isDark = true.obs;
 
   @override
   void onInit() {
