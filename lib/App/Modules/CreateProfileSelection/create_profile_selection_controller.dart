@@ -1,12 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:netflix/App/Routes/app_pages.dart';
-
 import '../../Data/Services/storage_service.dart';
 import '../Download/download_controller.dart';
 import '../MyList/mylist_controller.dart';
@@ -26,10 +21,7 @@ class ProfileSelectionController extends GetxController {
   void onInit() {
     super.onInit();
     loadProfiles();
-    // loadProfileData();
   }
-
-
 
   Future<void> loadProfiles() async {
     if (uid == null) return;
@@ -45,9 +37,16 @@ class ProfileSelectionController extends GetxController {
     final value = snapshot.value;
 
     if (value is Map) {
+      // profiles.assignAll(
+      //   value.entries.map((e) {
+      //     return Map<String, dynamic>.from(e.value);
+      //   }).toList(),
+      // );
       profiles.assignAll(
         value.entries.map((e) {
-          return Map<String, dynamic>.from(e.value);
+          final map = Map<String, dynamic>.from(e.value);
+          map["id"] = e.key;
+          return map;
         }).toList(),
       );
     }
@@ -68,9 +67,9 @@ class ProfileSelectionController extends GetxController {
     await database
         .child("users/$uid/selectedProfileId")
         .set(profileId);
-    await Get.find<MyListController>().loadMyListFromFirebase();
-    await Get.find<DownloadController>().loadDownloadsFromFirebase();
 
     Get.toNamed(AppRoutes.bottomAppBar);
+    await Get.find<MyListController>().loadMyListFromFirebase();
+    await Get.find<DownloadController>().loadDownloadsFromFirebase();
   }
 }

@@ -1,19 +1,13 @@
 import 'dart:io';
 
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:netflix/App/Modules/Profile/profile_controller.dart';
 import 'package:netflix/Constant/app_colors.dart';
-import '../../../Constant/app_size.dart';
 import '../../../Constant/app_strings.dart';
-import '../../Data/Services/storage_service.dart';
 import '../../Routes/app_pages.dart';
 import '../Auth/auth_controller.dart';
-import '../MyList/mylist_controller.dart';
 import '../Theme/theme.controller.dart';
 import 'dart:convert';
 
@@ -22,7 +16,7 @@ class ProfileView extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(ThemeController());
+    // Get.put(ThemeController());
 
     return Scaffold(
       appBar: AppBar(
@@ -34,47 +28,27 @@ class ProfileView extends GetView<ProfileController> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              /// =====================================================
-              /// 🎬 CURRENT SELECTED PROFILE (NETFLIX STYLE BIG VIEW)
-              /// =====================================================
               Obx(() {
                 final currentProfile = controller.profiles.firstWhereOrNull(
                   (p) => p["id"] == controller.selectedProfileId.value,
                 );
 
-                final imageBase64 = currentProfile?["image"] ?? "";
+                final imageBase64 = currentProfile?["imageBase64"] ?? "";
 
                 return Column(
                   children: [
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        /// PROFILE IMAGE
                         CircleAvatar(
                           radius: 60,
                           backgroundColor: AppThemeHelper.textColor(context),
-                          child: imageBase64.isNotEmpty
-                              ? ClipOval(
-                                  child: Image.memory(
-                                    base64Decode(imageBase64),
-                                    width: 120,
-                                    height: 120,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              :
-                          Icon(Icons.person,color: AppThemeHelper.reverseTextColor(context),)
-
-                          // Text(
-                          //         currentProfile?["name"]?[0] ?? "",
-                          //         style: const TextStyle(
-                          //           fontSize: 40,
-                          //           fontWeight: FontWeight.bold,
-                          //         ),
-                          //       ),
+                    child: buildSafeAvatar(
+                      imageBase64,
+                      radius: 60,
+                    ),
                         ),
 
-                        /// CAMERA ICON (BOTTOM RIGHT)
                         Positioned(
                           bottom: 0,
                           right: 10,
@@ -120,19 +94,18 @@ class ProfileView extends GetView<ProfileController> {
 
                         const SizedBox(width: 8),
 
-                        /// EDIT ICON
                         IconButton(
                           onPressed: () {
+                            controller.loadSelectedProfileForEdit();
                             Get.to(() => const EditProfileView());
                           },
                           icon: const Icon(Icons.edit),
                         ),
 
-                        /// DELETE ICON
                         IconButton(
                           onPressed: () {
                             controller.deleteProfile(
-                              controller.selectedProfileId.value,
+                              controller.selectedProfileId.value ,
                             );
                           },
                           icon: const Icon(Icons.delete, color: Colors.red),
@@ -145,18 +118,14 @@ class ProfileView extends GetView<ProfileController> {
 
               const SizedBox(height: 30),
 
-              /// =====================================================
-              /// 🎬 HORIZONTAL PROFILE LIST
-              /// =====================================================
-              Obx(() {
-                return SizedBox(
+           Obx(()=>
+             SizedBox(
                   height: 110,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: controller.profiles.length + 1,
                     itemBuilder: (context, index) {
-                      /// LAST ITEM = ADD PROFILE (+)
                       if (index == controller.profiles.length) {
                         return GestureDetector(
                           onTap: () {
@@ -176,13 +145,19 @@ class ProfileView extends GetView<ProfileController> {
                         );
                       }
 
+                      if (index >= controller.profiles.length) {
+                        return const SizedBox();
+                      }
+
                       final profile = controller.profiles[index];
                       final id = profile["id"];
+                      // final isSelected =
+                      //     id == controller.profileId;
                       final isSelected =
                           id == controller.selectedProfileId.value;
-
                       return GestureDetector(
                         onTap: () {
+                          controller.selectedProfileId.value = id;
                           controller.switchProfile(id);
                         },
                         child: Container(
@@ -203,17 +178,21 @@ class ProfileView extends GetView<ProfileController> {
                               CircleAvatar(
                                 radius: 30,
                                 backgroundColor:  AppThemeHelper.textColor(context),
-                                child: profile["image"] != null &&
-                                    profile["image"].isNotEmpty
-                                    ? ClipOval(
-                                  child: Image.memory(
-                                    base64Decode(profile["image"]),
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                                    : Icon(Icons.person,color: AppThemeHelper.reverseTextColor(context))
+                                child: buildSafeAvatar(
+                                  profile["imageBase64"],
+                                  radius: 30,
+                                ),
+                                // profile["imageBase64"] != null &&
+                                //     profile["imageBase64"].toString().isNotEmpty
+                                //     ? ClipOval(
+                                //   child: Image.memory(
+                                //     base64Decode(profile["imageBase64"]),
+                                //     width: 60,
+                                //     height: 60,
+                                //     fit: BoxFit.cover,
+                                //   ),
+                                // )
+                                //     : Icon(Icons.person,color: AppThemeHelper.reverseTextColor(context))
                                 // Text(
                                 //   profile["name"][0],
                                 //   style: const TextStyle(
@@ -237,14 +216,11 @@ class ProfileView extends GetView<ProfileController> {
                       );
                     },
                   ),
-                );
-              }),
+                ),
+           ),
 
               const SizedBox(height: 30),
 
-              /// =====================================================
-              /// 🔘 DARK MODE
-              /// =====================================================
               Obx(
                 () => SwitchListTile(
                   title: const Text(darkMode),
@@ -255,9 +231,6 @@ class ProfileView extends GetView<ProfileController> {
                 ),
               ),
 
-              /// =====================================================
-              /// 📂 MY LIST
-              /// =====================================================
               ListTile(
                 leading: const Icon(Icons.list),
                 title: const Text(myList),
@@ -267,15 +240,14 @@ class ProfileView extends GetView<ProfileController> {
                 },
               ),
 
-              /// =====================================================
-              /// 🚪 LOGOUT
-              /// =====================================================
               ListTile(
                 leading: Icon(Icons.logout, color: redColor),
                 title: Text(logout, style: TextStyle(color: redColor)),
                 onTap: () {
-                  final authController = Get.put(AuthController());
-                  authController.logout();
+                  controller.logout();
+                  // final authController = Get.find<AuthController>();
+                  // // final authController = Get.put(AuthController());
+                  // authController.logout();
                   // Get.toNamed(AppRoutes.login);
                 },
               ),
@@ -287,322 +259,166 @@ class ProfileView extends GetView<ProfileController> {
   }
 }
 
-// import 'dart:io';
+// class CreateProfileView extends GetView<ProfileController> {
+//   // final ProfileController controller = Get.find();
 //
-// import 'package:firebase_database/firebase_database.dart';
-// import 'package:firebase_storage/firebase_storage.dart';
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:get_storage/get_storage.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:netflix/App/Modules/Profile/profile_controller.dart';
-// import 'package:netflix/Constant/app_colors.dart';
-// import '../../../Constant/app_size.dart';
-// import '../../../Constant/app_strings.dart';
-// import '../../Data/Services/storage_service.dart';
-// import '../../Routes/app_pages.dart';
-// import '../Auth/auth_controller.dart';
-// import '../MyList/mylist_controller.dart';
-// import '../Theme/theme.controller.dart';
-// import 'dart:convert';
+//   final TextEditingController nameController = TextEditingController();
 //
-//
-// class ProfileView extends GetView<ProfileController>  {
-//    ProfileView({super.key});
-//
+//   RxString imageBase64 = ''.obs;
 //
 //   @override
 //   Widget build(BuildContext context) {
-//
-//     Get.put(ThemeController());
 //     return Scaffold(
-//       appBar: AppBar(title: Center(child: Text(profile)),automaticallyImplyLeading: false,),
-//       body: SingleChildScrollView(
-//         child: Padding(
-//           padding: const EdgeInsets.all(20),
-//           child:
-//
-//           Column(
-//             children: [
-//               Obx(() {
-//               final imageBase64 = controller.profileImageBase64.value;
-//               return Column(
-//                 children: [
-//                   Stack(
-//                     children: [
-//                       CircleAvatar(
-//                         radius: 50,
-//                         backgroundColor: Colors.grey.shade300,
-//                         child: imageBase64.isNotEmpty
-//                             ? ClipOval(
-//                           child: Image.memory(
-//                             base64Decode(imageBase64),
-//                             width: 100,
-//                             height: 100,
-//                             fit: BoxFit.cover,
-//                           ),
-//                         )
-//                             : const Icon(
-//                           Icons.person,
-//                           size: 50,
-//                           color: Colors.white,
-//                         ),
-//                       ),
-//                       // Obx(() => CircleAvatar(
-//                       //   radius: 50,
-//                       //   backgroundColor: Colors.grey.shade300,
-//                       //   child: controller.profileImageBase64.value.isNotEmpty
-//                       //       ? ClipOval(
-//                       //     child: Image.memory(
-//                       //       base64Decode(
-//                       //           controller.profileImageBase64.value),
-//                       //       width: 100,
-//                       //       height: 100,
-//                       //       fit: BoxFit.cover,
-//                       //     ),
-//                       //   )
-//                       //       : const Icon(
-//                       //     Icons.person,
-//                       //     size: 50,
-//                       //     color: Colors.white,
-//                       //   ),
-//                       // )),
-//                       Positioned(
-//                         bottom: 0,
-//                         right: 0,
-//                         child: GestureDetector(
-//                           onTap: controller.pickImage,
-//                           child: Container(
-//                             padding: const EdgeInsets.all(6),
-//                             decoration: const BoxDecoration(
-//                               color: Colors.red,
-//                               shape: BoxShape.circle,
-//                             ),
-//                             child: const Icon(
-//                               Icons.camera_alt,
-//                               color: Colors.white,
-//                               size: 18,
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: 10),
-//                   Text(
-//                     controller.storage.userEmail ?? 'No Email',
-//                     style: const TextStyle(
-//                         fontSize: 18, fontWeight: FontWeight.bold),
-//                   ),
-//
-//
-//                 ],
-//               );
-//             }),
-//             // CircleAvatar(
-//             //   radius: 50,
-//             //   // backgroundImage: AssetImage("assets/profile.png"),
-//             // ),
-//             // SizedBox(height: size2),
-//             //
-//             // Text(
-//             //   box.read('userEmail') ?? 'No Email',
-//             //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//             // ),
-//
-//             SizedBox(height: size2),
-//
-//             Obx(() => SwitchListTile(
-//               title: Text(darkMode),
-//               value: controller.themeController.isDark.value,
-//               onChanged: (value) {
-//                 controller.themeController.toggleTheme();
-//               },
-//             )),
-//
-//             ListTile(
-//               leading: Icon(Icons.list),
-//               title: Text(myList),
-//               trailing: Icon(Icons.arrow_forward_ios),
-//               onTap: () {
-//                 Get.toNamed(AppRoutes.myList);
-//               },
+//       appBar: AppBar(title: Text("Create Profile")),
+//       body: Padding(
+//         padding: const EdgeInsets.all(20),
+//         child: Column(
+//           children: [
+//             TextField(
+//               controller: nameController,
+//               decoration: InputDecoration(labelText: "Profile Name"),
 //             ),
+//             SizedBox(height: 20),
 //
-//             ListTile(
-//               leading: Icon(Icons.logout, color: redColor),
-//               title: Text(
-//                 logout,
-//                 style: TextStyle(color: redColor),
-//               ),
-//               onTap: () {
-//                 final authController = Get.put(AuthController());
-//                 authController.logout();
-//                 Get.toNamed(AppRoutes.login);
-//               },
-//             ),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//               children: [
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     Get.back();
+//                   },
+//                   child: Text("Cancel"),
+//                 ),
 //
-//               SizedBox(height: 30),
+//                 ElevatedButton(
+//                   onPressed: () async {
+//                     final name = nameController.text.trim();
 //
-//               ElevatedButton(
-//                 onPressed: () {
-//                   Get.to(() => CreateProfileView());
-//                 },
-//                 child: Text("Add Profile"),
-//               ),
+//                     if (name.isEmpty) return;
 //
-//
-//               Obx(() {
-//                 return Column(
-//                   children: controller.profiles.map((profile) {
-//                     final id = profile["id"];
-//
-//                     return ListTile(
-//                       leading: CircleAvatar(
-//                         child: Text(profile["name"][0]),
-//                       ),
-//                       title: Text(profile["name"]),
-//                       subtitle: Text(
-//                           id == controller.selectedProfileId.value
-//                               ? "Current Profile"
-//                               : ""),
-//
-//                       // TAP = SWITCH
-//                       onTap: () {
-//                         controller.switchProfile(id);
-//                       },
-//
-//                       // MENU
-//                       trailing: PopupMenuButton<String>(
-//                         onSelected: (value) {
-//                           if (value == "edit") {
-//                             Get.to(() => EditProfileView());
-//                             // EditProfileView();
-//                             // controller.editProfile(
-//                             //     id, "Edited Name", "");
-//                           }
-//                           if (value == "delete") {
-//                             controller.deleteProfile(id);
-//                           }
-//                         },
-//                         itemBuilder: (context) => [
-//                           PopupMenuItem(
-//                             value: "edit",
-//                             child: Text("Edit"),
-//                           ),
-//                           PopupMenuItem(
-//                             value: "delete",
-//                             child: Text("Delete"),
-//                           ),
-//                         ],
-//                       ),
+//                     final alreadyExists = controller.profiles.any(
+//                       (profile) =>
+//                           profile["name"].toString().toLowerCase() ==
+//                           name.toLowerCase(),
 //                     );
-//                   }).toList(),
-//                 );
-//               }),
-//   ],
-//           ),
+//
+//                     if (alreadyExists) {
+//                       Get.snackbar(
+//                         "Profile Exists",
+//                         "Name already taken. Please choose a different name.",
+//                         snackPosition: SnackPosition.BOTTOM,
+//                       );
+//                       return;
+//                     }
+//
+//                     await controller.createProfile(name, imageBase64.value);
+//                     Get.back();
+//                   },
+//                   child: Text("Create"),
+//                 ),
+//               ],
+//             ),
+//           ],
 //         ),
 //       ),
 //     );
 //   }
-//
-//
-//
-//
 // }
-//
-//
+
 class CreateProfileView extends GetView<ProfileController> {
-  // final ProfileController controller = Get.find();
-
-  final TextEditingController nameController = TextEditingController();
-
-  RxString imageBase64 = ''.obs;
+  const CreateProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final nameController = TextEditingController();
+    RxString imageBase64 = ''.obs;
+
     return Scaffold(
-      appBar: AppBar(title: Text("Create Profile")),
+      appBar: AppBar(
+        title: const Text("Create Profile"),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            // Obx(
+            //       () => Stack(
+            //     alignment: Alignment.bottomRight,
+            //     children: [
+            //       GestureDetector(
+            //         onTap: () async {
+            //           final XFile? image =
+            //           await controller._picker
+            //               .pickImage(
+            //               source: ImageSource.gallery);
+            //
+            //           if (image == null) return;
+            //
+            //           File file = File(image.path);
+            //           final bytes =
+            //           await file.readAsBytes();
+            //
+            //           imageBase64.value =
+            //               base64Encode(bytes);
+            //         },
+            //         child: CircleAvatar(
+            //           radius: 55,
+            //           backgroundColor:
+            //           Colors.grey.shade200,
+            //           backgroundImage:
+            //           imageBase64.value.isNotEmpty
+            //               ? MemoryImage(
+            //             base64Decode(
+            //                 imageBase64.value),
+            //           )
+            //               : null,
+            //           child: imageBase64.value.isEmpty
+            //               ? const Icon(Icons.person,
+            //               size: 50)
+            //               : null,
+            //         ),
+            //       ),
+            //
+            //       const Icon(Icons.camera_alt,
+            //           color: Colors.black),
+            //     ],
+            //   ),
+            // ),
+            //
+            // const SizedBox(height: 30),
+
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: "Profile Name"),
+              decoration: InputDecoration(
+                labelText: "Profile Name",
+                border: OutlineInputBorder(
+                  borderRadius:
+                  BorderRadius.circular(12),
+                ),
+              ),
             ),
 
-            // SizedBox(height: 20),
+            const SizedBox(height: 30),
 
-            // Obx(() => GestureDetector(
-            //   onTap: controller.pickImageForCreateProfile,
-            //   child: CircleAvatar(
-            //     radius: 40,
-            //     backgroundColor: Colors.grey,
-            //     child: controller.tempImageBase64.value.isEmpty
-            //         ? const Icon(Icons.person)
-            //         : ClipOval(
-            //       child: Image.memory(
-            //         base64Decode(controller.tempImageBase64.value),
-            //         width: 80,
-            //         height: 80,
-            //         fit: BoxFit.cover,
-            //       ),
-            //     ),
-            //   ),
-            // )),
-            SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () async {
+                  final name =
+                  nameController.text.trim();
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // CANCEL
-                ElevatedButton(
-                  onPressed: () {
-                    Get.back();
-                  },
-                  child: Text("Cancel"),
-                ),
+                  if (name.isEmpty) return;
 
-                // CREATE
-                ElevatedButton(
-                  onPressed: () async {
-                    final name = nameController.text.trim();
+                  await controller.createProfile(
+                      name, imageBase64.value);
 
-                    if (name.isEmpty) return;
-
-                    // CHECK IF NAME ALREADY EXISTS
-                    final alreadyExists = controller.profiles.any(
-                      (profile) =>
-                          profile["name"].toString().toLowerCase() ==
-                          name.toLowerCase(),
-                    );
-
-                    if (alreadyExists) {
-                      Get.snackbar(
-                        "Profile Exists",
-                        "Name already taken. Please choose a different name.",
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                      return;
-                    }
-
-                    await controller.createProfile(name, imageBase64.value);
-                    Get.back();
-                    // final name =
-                    // nameController.text.trim();
-                    //
-                    // if (name.isEmpty) return;
-                    //
-                    // await controller.createProfile(
-                    //     name, imageBase64.value);
-                    //
-                    // Get.back();
-                  },
-                  child: Text("Create"),
-                ),
-              ],
+                  Get.back();
+                },
+                child:
+                const Text("Create Profile"),
+              ),
             ),
           ],
         ),
@@ -626,7 +442,6 @@ class EditProfileView extends GetView<ProfileController> {
         child: Column(
           children: [
 
-            /// 🔥 PROFILE IMAGE WITH CAMERA ICON
             Obx(
                   () => Stack(
                 alignment: Alignment.bottomRight,
@@ -649,7 +464,6 @@ class EditProfileView extends GetView<ProfileController> {
                     ),
                   ),
 
-                  /// Camera Icon
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
@@ -668,7 +482,6 @@ class EditProfileView extends GetView<ProfileController> {
 
             const SizedBox(height: 30),
 
-            /// 🔥 NAME FIELD
             TextField(
               controller: controller.nameController,
               decoration: InputDecoration(
@@ -681,7 +494,6 @@ class EditProfileView extends GetView<ProfileController> {
 
             const SizedBox(height: 30),
 
-            /// 🔥 SAVE BUTTON
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -704,57 +516,29 @@ class EditProfileView extends GetView<ProfileController> {
       ),
     );
   }
+
+
+
 }
 
-// class EditProfileView extends GetView<ProfileController> {
-//   const EditProfileView({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text("Edit Profile")),
-//       body: Padding(
-//         padding: const EdgeInsets.all(20),
-//         child: Column(
-//           children: [
-//             /// IMAGE
-//             Obx(
-//               () => GestureDetector(
-//                 onTap: controller.pickImage,
-//                 child: CircleAvatar(
-//                   radius: 50,
-//                   backgroundColor: Colors.grey.shade300,
-//                   child: controller.imageBase64.value.isNotEmpty
-//                       ? ClipOval(
-//                           child: Image.memory(
-//                             base64Decode(controller.imageBase64.value),
-//                             width: 100,
-//                             height: 100,
-//                             fit: BoxFit.cover,
-//                           ),
-//                         )
-//                       : const Icon(Icons.person, size: 50),
-//                 ),
-//               ),
-//             ),
-//
-//             const SizedBox(height: 20),
-//
-//             /// NAME
-//             TextField(
-//               controller: controller.nameController,
-//               decoration: const InputDecoration(labelText: "Profile Name"),
-//             ),
-//
-//             const SizedBox(height: 30),
-//
-//             ElevatedButton(
-//               onPressed: controller.updateProfile,
-//               child: const Text("Save Changes"),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+
+Widget buildSafeAvatar(String? imageBase64,
+    {double radius = 40}) {
+  if (imageBase64 == null || imageBase64.isEmpty) {
+    return Icon(Icons.person, size: radius);
+  }
+
+  try {
+    return ClipOval(
+      child: Image.memory(
+        base64Decode(imageBase64),
+        width: radius * 2,
+        height: radius * 2,
+        fit: BoxFit.cover,
+      ),
+    );
+  } catch (_) {
+    return Icon(Icons.person, size: radius);
+  }
+}
+

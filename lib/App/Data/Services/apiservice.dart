@@ -1,16 +1,12 @@
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_navigation/src/snackbar/snackbar.dart';
 import 'package:http/http.dart' as http;
 import 'package:netflix/App/Data/Services/utils.dart';
-
 import '../Models/hot_news_model.dart';
 import '../Models/movie_category_model.dart';
 import '../Models/movie_details_model.dart';
@@ -81,6 +77,8 @@ class ApiService {
       throw Exception("Fetching error to find movies: $e");
     }
   }
+
+
   void showSnackBar(String message) {
     Get.snackbar(
       '',
@@ -132,6 +130,7 @@ class ApiService {
       }
     }
   }
+
   //upcoming movie
   Future<UpcomingMovies?> upCommingMovies() async{
     try{
@@ -262,9 +261,18 @@ class ApiService {
       });
       if(response.statusCode == 200){
         return SearchMovies.fromJson(jsonDecode(response.body));      }
-      else{
-        throw Exception("Failed to Load Movies");
+      else if (response.statusCode == 404) {
+        // Movie not found
+        print("SearchMovies 404: No movies found for query: $query");
+        return null;
+      } else {
+        print(
+            "SearchMovies failed. Status: ${response.statusCode}, Body: ${response.body}");
+        return null;
       }
+      // else{
+      //   throw Exception("Failed to Load Movies");
+      // }
     }
     catch(e){
       throw Exception("Fetching error to find movies: $e");
@@ -312,24 +320,6 @@ class ApiService {
     }
   }
 
-  // Future<CategoryMovies?> fetchMoviesByGenre(int genreId) async {
-  //   try {
-  //     final endPoint = "discover/movie";
-  //     final apiUrl =
-  //         "$baseUrl$endPoint?api_key=$apiKey&with_genres=$genreId";
-  //
-  //     final response = await http.get(Uri.parse(apiUrl));
-  //
-  //     if (response.statusCode == 200) {
-  //       return CategoryMovies.fromJson(jsonDecode(response.body));
-  //     } else {
-  //       throw Exception("Failed to load genre movies");
-  //     }
-  //   } catch (e) {
-  //     throw Exception("Fetching error genre movies: $e");
-  //   }
-  // }
-
   Future<GenreMovieResponse> fetchMoviesByGenre(int genreId) async {
     final url =
         'https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&with_genres=$genreId';
@@ -357,6 +347,7 @@ class ApiService {
   }
 
   Future<MovieTrailer?> fetchTrailerKey(int movieId) async {
+    try{
     final url =
         "https://api.themoviedb.org/3/movie/$movieId/videos?api_key=$apiKey";
 
@@ -369,42 +360,20 @@ class ApiService {
 
       return movieTrailer;
     }
+    else if (response.statusCode == 404) {
+      print("Trailer 404: Movie $movieId not found");
+      return null;
+    } else {
+      print("Trailer failed. Status: ${response.statusCode}");
+      return null;
+    }}catch (e) {
+    print("Trailer network or parsing error: $e");
+    return null;
+    }
 
     return null;
   }
-
-  // Future<MovieTrailer?> fetchTrailerKey(int movieId) async {
-  //   final url =
-  //       "https://api.themoviedb.org/3/movie/$movieId/videos?api_key=$apiKey";
-  //
-  //   final response = await http.get(Uri.parse(url));
-  //
-  //   if (response.statusCode == 200) {
-  //     final data = jsonDecode(response.body);
-  //     final results = data["results"] as List;
-  //
-  //     final trailer = results.firstWhere(
-  //           (video) =>
-  //       video["type"] == "Trailer" &&
-  //           video["site"] == "YouTube",
-  //       orElse: () => null,
-  //     );
-  //
-  //     if (trailer != null) {
-  //       return MovieTrailer.fromJson(trailer);
-  //     }
-  //   }
-  //
-  //   return null;
-  // }
-
-
-
   }
-
-
-
-
 
 //movieid
 //query = harry

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:netflix/Constant/app_colors.dart';
-
 import 'create_profile_selection_controller.dart';
 
 class ProfileSelectionView
@@ -71,7 +70,8 @@ class ProfileSelectionView
                           fit: BoxFit.cover,
                         ),
                       )
-                          : const Icon(
+                          :
+                      const Icon(
                         Icons.person,
                         color: Colors.white,
                         size: 40,

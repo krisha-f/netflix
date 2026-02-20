@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:netflix/Constant/app_colors.dart';
 import 'package:netflix/Constant/app_size.dart';
@@ -86,7 +85,7 @@ class SignUpView extends GetView<AuthController> {
                       backgroundColor: redColor,
                     ),
                     onPressed: controller.signup,
-                    child: Text(signIn),
+                    child: Text(signUp),
                   ),
                 )),
 

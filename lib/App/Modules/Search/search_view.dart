@@ -7,7 +7,6 @@ import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:netflix/App/Modules/Search/search_controller.dart';
 import 'package:netflix/Constant/app_colors.dart';
 import 'package:netflix/Constant/app_size.dart';
-
 import '../../Data/Services/utils.dart';
 import '../trailer_player_screen.dart';
 
@@ -69,12 +68,14 @@ class SearchView extends GetView<CustomSearchController> {
                             Stack(
                               alignment: Alignment.center,
                               children: [
+                                movie.posterPath != null?
                                 Image.network(
                                   "$imageUrl${movie.posterPath}",
                                   height: 100,
                                   width: 100,
                                   fit: BoxFit.cover,
-                                ),
+                                ):SizedBox.shrink(),
+                                movie.posterPath != null?
                                 InkWell(
                                   onTap: () async {
                                     Get.dialog(
@@ -123,15 +124,16 @@ class SearchView extends GetView<CustomSearchController> {
                                     Icons.play_circle_outline,
                                     color: whiteColor,
                                   ),
-                                ),
+                                ):SizedBox.shrink(),
                               ],
                             ),
                             SizedBox(width: size5),
+                            movie.posterPath != null?
                             Text(
                               movie.title ?? '',
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                            ),
+                            ):SizedBox.shrink(),
                           ],
                         ),
                         SizedBox(height: size2),

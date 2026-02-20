@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -18,13 +16,13 @@ import 'App/Routes/app_pages.dart';
 
 Future<void> main() async {
 
-  Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    await Firebase.initializeApp();
-    print("Handling background message: ${message.messageId}");
-  }
+  // Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  //   await Firebase.initializeApp();
+  //   print("Handling background message: ${message.messageId}");
+  // }
 
-// Register the handler
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+// Register the FirebaseMessage-handler
+//   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runZonedGuarded(() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
@@ -46,10 +44,14 @@ Future<void> main() async {
   else{
   await Firebase.initializeApp();}
 
-  await Get.putAsync(() => NotificationService().init());
+  // await Get.putAsync(() => NotificationService().init());
 
   await Get.putAsync(() async => StorageService());
   Get.put(ThemeController());
+  //
+  // ThemeController.loadTheme();
+  // final themeController = Get.put(ThemeController());
+  // await themeController.loadTheme();
 
   FlutterError.onError =
       FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -84,26 +86,3 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     // Find the ThemeController
-//     // final themeController = Get.find<ThemeController>();
-//
-//     // Use Obx to reactively rebuild when theme changes
-//
-//       return GetMaterialApp(
-//         debugShowCheckedModeBanner: false,
-//         title: 'Netflix',
-//         theme: ThemeData.light(),
-//         darkTheme: ThemeData.dark(),
-//         themeMode: ThemeMode.system,
-//         // themeController.isDark.value ? ThemeMode.dark : ThemeMode.light,
-//         initialBinding: InitialBinding(),
-//         initialRoute: AppPages.initial,
-//         getPages: AppPages.routes,
-//       );
-//   }
-// }

@@ -16,16 +16,6 @@ import 'hotnews_controller.dart';
 class HotNewsView extends GetView<HotNewsController> {
   HotNewsView({super.key});
 
-  //
-  // final ApiService apiService = ApiService();
-  //  // late final Future<HotNews?> hotNewsData =  apiService.hotNews();
-  //
-  //  late Future<HotNews?> hotNewsData =  apiService.hotNews();
-
-  // void initState(){
-  //   hotNewsData = apiService.hotNews();
-  // }
-
   @override
   Widget build(BuildContext context) {
     String getShortName(String name) {
@@ -52,7 +42,7 @@ class HotNewsView extends GetView<HotNewsController> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
+            return Center(child: Text("Network Error: Please Check your Network"));
           } else if (snapshot.hasData) {
             // final movies = snapshot.data!.results;
             final movies = snapshot.data?.results ?? [];

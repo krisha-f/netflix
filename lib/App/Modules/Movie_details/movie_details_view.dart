@@ -8,7 +8,6 @@ import '../../../Constant/app_colors.dart';
 import '../../../Constant/app_images.dart';
 import '../../../Constant/app_strings.dart';
 import '../../Data/Models/movie_details_model.dart';
-import '../../Data/Services/apiservice.dart';
 import '../MyList/mylist_controller.dart';
 import '../trailer_player_screen.dart';
 import 'movie_details_controller.dart';
@@ -33,11 +32,17 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
           future: controller.movieDetailsData,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return Padding(
+                padding: const EdgeInsets.only(top: 100.0),
+                child: const Center(child: CircularProgressIndicator()),
+              );
             }
             if (snapshot.hasError) {
               print("ERROR: ${snapshot.error}");
-              return Center(child: Text("Error: ${snapshot.error}"));
+              return Padding(
+                padding: const EdgeInsets.only(top: 100.0),
+                child: Center(child: Text("Network Error: please check your network")),
+              );
             }
 
             if (!snapshot.hasData || snapshot.data == null) {
@@ -306,109 +311,6 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                           style: TextStyle(color:  AppThemeHelper.textColor(context)),
                         ),
                         Divider(thickness: 2),
-
-                        // Align(
-                        //     alignment: Alignment.topLeft,
-                        //     child: Text("Title : ${movie?.title ?? ""}",style: TextStyle(color: whiteColor))),
-                        // Align(
-                        //     alignment: Alignment.topLeft,
-                        //     child: Text("Status : ${movie?.status ?? ""}",style: TextStyle(color: whiteColor),)),
-                        // Row(
-                        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        //   children: [
-                        //     Column(
-                        //       children: [
-                        //         Icon(Icons.add,color: whiteColor,),
-                        //         SizedBox(height: size1),
-                        //         Text(myList,style: TextStyle(color: whiteColor,),)
-                        //       ],
-                        //     ),
-                        //     SizedBox(width: size1,),
-                        //     Column(
-                        //       children: [
-                        //         Icon(Icons.thumb_up,color: whiteColor,),
-                        //         SizedBox(height: size1),
-                        //
-                        //         Text(rate,style: TextStyle(color: whiteColor,),)
-                        //       ],
-                        //     ),
-                        //     SizedBox(width: size1,),
-                        //     Column(
-                        //       children: [
-                        //         Icon(Icons.share,color: whiteColor,),
-                        //         SizedBox(height: size1),
-                        //         Text(share,style: TextStyle(color: whiteColor,),)
-                        //       ],
-                        //     )
-                        //   ],
-                        // ),
-                        // SizedBox(height: size1,),
-                        // FutureBuilder(
-                        //   future: controller.movieRecommendationsData,
-                        //   builder: (context, snapshot) {
-                        //
-                        //
-                        //     if (snapshot.connectionState == ConnectionState.waiting) {
-                        //       return const Center(
-                        //         child: CircularProgressIndicator(),
-                        //       );
-                        //     }
-                        //
-                        //     if (snapshot.hasError) {
-                        //       return const Center(
-                        //         child: Text(
-                        //           somethingWentWrong,
-                        //           style: TextStyle(color: whiteColor),
-                        //         ),
-                        //       );
-                        //     }
-                        //
-                        //     if (!snapshot.hasData || snapshot.data == null) {
-                        //       return const SizedBox();
-                        //     }
-                        //
-                        //     final movie = snapshot.data;
-                        //
-                        //     if (movie?.results == null || movie!.results!.isEmpty) {
-                        //       return const SizedBox();
-                        //     }
-                        //
-                        //     return Column(
-                        //       crossAxisAlignment: CrossAxisAlignment.start,
-                        //       children: [
-                        //         const Text(
-                        //           moreLikeThis,
-                        //           style: TextStyle(color: whiteColor),
-                        //         ),
-                        //         const SizedBox(height: size1),
-                        //         SizedBox(
-                        //           height: cHeight4,
-                        //           child: ListView.builder(
-                        //             scrollDirection: Axis.horizontal,
-                        //             itemCount: movie.results!.length,
-                        //             itemBuilder: (context, index) {
-                        //               final item = movie.results![index];
-                        //
-                        //               if (item.posterPath == null) {
-                        //                 return const SizedBox();
-                        //               }
-                        //
-                        //               return Padding(
-                        //                 padding: const EdgeInsets.all(8.0),
-                        //                 child: CachedNetworkImage(
-                        //                   imageUrl: "$imageUrl${item.posterPath}",
-                        //                   height: cHeight4,
-                        //                   width: cWidth1,
-                        //                   fit: BoxFit.cover,
-                        //                 ),
-                        //               );
-                        //             },
-                        //           ),
-                        //         ),
-                        //       ],
-                        //     );
-                        //   },
-                        // )
                         TabBar(
                           controller: controller.tabController,
                           indicatorColor: Colors.red,
@@ -449,7 +351,10 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
   }
 
   Widget _buildMyListTab(MovieDetails? movie,context) {
-    final myListController = Get.find<MyListController>();
+    // final myListController = Get.find<MyListController>();
+    final myListController = Get.isRegistered<MyListController>()
+        ? Get.find<MyListController>()
+        : Get.put(MyListController());
 
     return Obx(() {
       if (myListController.myMovies.isEmpty) {
@@ -552,7 +457,6 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      /// 👤 Email
                       Text(
                         review["email"] ?? "Unknown",
                         style: const TextStyle(
@@ -566,7 +470,6 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
 
                       const SizedBox(height: 10),
 
-                      /// ⭐ Rating (Soft White, No Highlight)
                       Row(
                         children: List.generate(
                           5,
@@ -585,7 +488,6 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
 
                       const SizedBox(height: 14),
 
-                      /// 📝 Review Text
                       Expanded(
                         child: Text(
                           review["review"] ?? "",
@@ -624,7 +526,6 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
             mainAxisSize: MainAxisSize.min,
             children: [
 
-              /// 🎬 Title
               Text(
                 "Add Review",
                 style: TextStyle(
@@ -637,7 +538,6 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
 
               const SizedBox(height: 20),
 
-              /// ⭐ Rating Selector
               Obx(
                     () => Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -665,7 +565,6 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
 
               const SizedBox(height: 20),
 
-              /// 📝 Review TextField
               TextField(
                 controller: textController,
                 style: const TextStyle(color: Colors.white),
@@ -684,7 +583,6 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
 
               const SizedBox(height: 25),
 
-              /// 🚀 Submit Button (Gradient Netflix Style)
               GestureDetector(
                 onTap: () {
                   if (selectedRating.value == 0) {
@@ -735,74 +633,6 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
     );
   }
 
-  // void showAddReviewDialog() {
-  //   final textController = TextEditingController();
-  //   RxInt selectedRating = 0.obs;
-  //
-  //   Get.defaultDialog(
-  //     title: "Add Review",
-  //     backgroundColor: Colors.black,
-  //     titleStyle: TextStyle(color: Colors.white),
-  //     content: Column(
-  //       children: [
-  //         /// ⭐ Rating Selector
-  //         Obx(
-  //           () => Row(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: List.generate(
-  //               5,
-  //               (index) => IconButton(
-  //                 onPressed: () {
-  //                   selectedRating.value = index + 1;
-  //                 },
-  //                 icon: Icon(
-  //                   index < selectedRating.value
-  //                       ? Icons.star
-  //                       : Icons.star_border,
-  //                   color: Colors.amber,
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //
-  //         SizedBox(height: 12),
-  //
-  //         TextField(
-  //           controller: textController,
-  //           style: TextStyle(color: Colors.white),
-  //           decoration: InputDecoration(
-  //             hintText: "Write your review...",
-  //             hintStyle: TextStyle(color: Colors.grey),
-  //             enabledBorder: OutlineInputBorder(
-  //               borderSide: BorderSide(color: Colors.grey),
-  //             ),
-  //           ),
-  //         ),
-  //
-  //         SizedBox(height: 20),
-  //
-  //         ElevatedButton(
-  //           onPressed: () {
-  //             if (selectedRating.value == 0) {
-  //               Get.snackbar("Error", "Please select rating");
-  //               return;
-  //             }
-  //
-  //             controller.addReview(
-  //               textController.text.trim(),
-  //               selectedRating.value.toDouble(),
-  //             );
-  //
-  //             Get.back();
-  //           },
-  //           child: Text("Submit"),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Widget _buildMoreTab(MovieDetails? movie) {
     return FutureBuilder(
       future: controller.movieRecommendationsData,
@@ -812,10 +642,10 @@ class MovieDetailsView extends GetView<MovieDetailsController> {
         }
 
         if (snapshot.hasError) {
-          return const Center(
+          return Center(
             child: Text(
               somethingWentWrong,
-              style: TextStyle(color: whiteColor),
+              style: TextStyle(color: AppThemeHelper.textColor(context)),
             ),
           );
         }

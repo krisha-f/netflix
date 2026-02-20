@@ -35,9 +35,27 @@ class CustomSearchController extends GetxController {
     try {
       isSearching.value = true;
       final result = await apiService.searchMovies(text);
-      searchMovie.value = result;
+      if (result == null || result.results!.isEmpty) {
+        searchMovie.value = null;
+        // Get.snackbar(
+        //   "No Results",
+        //   "No movies found for \"$text\"",
+        //   backgroundColor: CupertinoColors.systemGrey5,
+        //   colorText: CupertinoColors.black,
+        // );
+      } else {
+        searchMovie.value = result;
+      }
+      // searchMovie.value = result;
     } catch (e) {
       print("Search Error: $e");
+      // Get.snackbar(
+      //   "Search Failed",
+      //   e.toString(),
+      //   backgroundColor: CupertinoColors.systemGrey5,
+      //   colorText: CupertinoColors.black,
+      // );
+      searchMovie.value = null;
     } finally {
       isSearching.value = false;
     }

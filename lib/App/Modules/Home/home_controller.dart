@@ -1,22 +1,12 @@
-
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:netflix/App/Data/Services/apiservice.dart';
 import '../../Data/Models/movie_category_model.dart';
-import '../../Data/Models/movie_entity.dart';
 import '../../Data/Models/movie_model.dart';
-import '../../Data/Models/movie_trailer_model.dart';
 import '../../Data/Models/top_rated_movie_model.dart' as topRated;
 import '../../Data/Models/trending_movie_model.dart' as trendMovie;
 import '../../Data/Models/tv_popular_movie_model.dart' as tvPopular;
 import '../../Data/Models/upcoming_movie_model.dart' as upComing;
-import '../../Data/Services/connectivity_service.dart';
-import '../../Data/Services/network_service.dart';
-import '../../Data/Services/socket_service.dart';
-import '../../Data/Services/utils.dart';
 import '../MyList/mylist_controller.dart';
 
 class HomeController extends GetxController{
@@ -31,7 +21,7 @@ class HomeController extends GetxController{
 
   Rx<MovieResults?> currentMovie = Rx<MovieResults?>(null);
   final ApiService apiService = ApiService();
-  final myListController = Get.find<MyListController>();
+  // final myListController = Get.find<MyListController>();
   // var currentMovie = Rxn<Results>();
 
   var genres = <Genres>[].obs;
@@ -48,9 +38,17 @@ class HomeController extends GetxController{
   RxInt selectedTvPopularPosterIndex = (-1).obs;
 
 
+ // List<MovieResults> allMovies = [];
+ //
+ // int currentPage = 1;
+ // int totalPages = 1;
+ //
+ // late Future<void> moviesFuture;
+
  @override
   void onInit() {
     super.onInit();
+    // moviesFuture = fetchMovies();
     moviesData =apiService.fetchMovies();
     upcomingMoviesData = apiService.upCommingMovies();
     treadingMoviesData = apiService.trendingMovies();
@@ -61,27 +59,26 @@ class HomeController extends GetxController{
   }
 
 
-  // Future<void> loadAllData() async {
-  //   try {
-  //     moviesData = apiService.fetchMovies();
-  //
-  //     upcomingMoviesData = apiService.upCommingMovies();
-  //
-  //     treadingMoviesData = apiService.trendingMovies();
-  //
-  //     topRatedMoviesData = apiService.topRatedMovies();
-  //
-  //     tvPopularMoviesData = apiService.tvPopularMovies();
-  //
-  //     categoriesMoviesData = apiService.categoryMovies();
-  //
-  //     await loadGenres();
-  //
-  //   } catch (e) {
-  //     debugPrint("HOME LOAD ERROR: $e");
-  //   }
-  // }
 
+
+
+
+ // Future<void> fetchMovies() async {
+ //   final response = await apiService.fetchMovies(currentPage);
+ //
+ //   totalPages = response.totalPages ?? 1;
+ //
+ //   allMovies.addAll(response.results ?? []);
+ //
+ //   currentPage++;
+ // }
+ //
+ // Future<void> loadMore() async {
+ //   if (currentPage <= totalPages) {
+ //     moviesFuture = fetchMovies();
+ //     update();
+ //   }
+ // }
 
 
   Future<void> loadGenres() async {
@@ -115,30 +112,5 @@ class HomeController extends GetxController{
       _isRequestRunning = false;
     }
   }
-
-  // Future<List<MovieEntity>> fetchUpcomingMovies() async {
-  //   final response = await apiService.getUpcomingMovies();
-  //
-  //   return response.results?.map((e) {
-  //     return MovieEntity(
-  //       id: e.id ?? 0,
-  //       posterPath: e.posterPath,
-  //       title: e.title,
-  //     );
-  //   }).toList() ?? [];
-  // }
-  //
-  // Future<List<MovieEntity>> fetchTrendingMovies() async {
-  //   final response = await apiService.getTrendingMovies();
-  //
-  //   return response.results?.map((e) {
-  //     return MovieEntity(
-  //       id: e.id ?? 0,
-  //       posterPath: e.posterPath,
-  //       title: e.title,
-  //     );
-  //   }).toList() ?? [];
-  // }
-
 
 }

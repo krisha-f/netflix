@@ -7,7 +7,5 @@ class HotNewsBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<HotNewsController>(() => HotNewsController());
-
-    // Get.put<HotNewsController>(HotNewsController());
   }
 }

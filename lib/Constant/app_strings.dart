@@ -26,6 +26,7 @@ const String newToNetflixLogin = "New to Netflix? Login In";
 
 //home
 const String problemToFetchData = "Problem To Fetch Data";
+const String NetworkError = "Network Issue To Fetch Data";
 const String playText = "Play";
 const String added = "Added";
 const String myList = "My List";
